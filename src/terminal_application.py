@@ -87,10 +87,14 @@ class TerminalApplication(object):
 		training.start_training()
 		end = time()
 		print(f"Training took {end - start:.2f} seconds")
+		average_performance, max_performance = self.get_training_result_performance(training)
 		Path(f"saved_data/{training_type}/{config_file}").mkdir(parents=True, exist_ok=True)
 		with open(f"saved_data/{training_type}/{config_file}/{eating_number}_out.json", "w+") as fp:
-			json.dump(training.to_dict() | {"duration" : end - start}, fp, separators=(',', ':'))
-		average_performance, max_performance = self.get_training_result_performance(training)
+			json.dump(training.to_dict() | {
+				"duration" : end - start,
+				"average-performance" : average_performance,
+				"max-performance" : max_performance
+			}, fp, separators=(',', ':'))
 		print(f"Average Performance: {average_performance}, Maximum Performance: {max_performance}")
 
 	def get_training_result_performance(self, training: Training) -> None:
