@@ -33,7 +33,7 @@ class DefaultAgent(Agent):
 				if speed:
 					self.set_in_state("x", int((self.get_from_state("x") + cos(radians(self.get_from_state("angle"))) * 4) % self.width))
 					self.set_in_state("y", int((self.get_from_state("y") + sin(radians(self.get_from_state("angle"))) * 4) % self.height))
-				if dist != None and dist < self.eating_distance:
+				if food != None and dist < self.eating_distance:
 					food.eaten_by += [self]
 			self.save_state()
 	

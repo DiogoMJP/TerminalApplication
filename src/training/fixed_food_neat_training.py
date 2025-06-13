@@ -9,7 +9,8 @@ from neat	import Config, DefaultGenome
 from typing	import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from src.simulation	import Simulation
+	from src.agent.brain	import Brain
+	from src.simulation		import Simulation
 
 
 
@@ -22,7 +23,7 @@ class FixedFoodNeatTraining(Training):
 	):
 		super().__init__(
 			n_generations, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
-			food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps
+			food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps, "fixed-food-simulation"
 		)
 		self.config_file				: str	= config_file
 		self.perception_processor_type	: str	= perception_processor_type
@@ -78,21 +79,7 @@ class FixedFoodNeatTraining(Training):
 				"perception-processor-type" : self.perception_processor_type,
 				"neat-neural-network" : neat.nn.FeedForwardNetwork.create(genome, config)
 			})
-			sim = create_simulation("fixed-food-simulation", {
-				"brain" : brain,
-				"width" : self.width,
-				"height" : self.height,
-				"n-agents" : self.n_agents,
-				"agent-type" : self.agent_type,
-				"agents-lifespan" : self.agents_lifespan,
-				"agents-lifespan-extension" : self.agents_lifespan_extension,
-				"food-lifespan" : self.food_lifespan,
-				"perception-distance" : self.perception_distance,
-				"eating-distance" : self.eating_distance,
-				"eating-number" : self.eating_number,
-				"max-time-steps" : self.max_time_steps,
-				"n-food" : self.n_food
-			})
+			sim = create_simulation("fixed-food-simulation", self.generate_simulation_parameters(brain))
 			sim.start_loop()
 			self.simulations[str(self.generation)][str(id)] = (sim, genome)
 		while not all([sim.finished for sim, _ in self.simulations[str(self.generation)].values()]):
@@ -101,6 +88,23 @@ class FixedFoodNeatTraining(Training):
 			pair[1].fitness = pair[0].get_n_eaten_food()
 
 		self.generation += 1
+	
+	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:
+		return {
+			"brain" : brain,
+			"width" : self.width,
+			"height" : self.height,
+			"n-agents" : self.n_agents,
+			"agent-type" : self.agent_type,
+			"agents-lifespan" : self.agents_lifespan,
+			"agents-lifespan-extension" : self.agents_lifespan_extension,
+			"food-lifespan" : self.food_lifespan,
+			"perception-distance" : self.perception_distance,
+			"eating-distance" : self.eating_distance,
+			"eating-number" : self.eating_number,
+			"max-time-steps" : self.max_time_steps,
+			"n-food" : self.n_food
+		}
 
 	def get_simulation(self, generation: str, simulation: str) -> Simulation|None:
 		if generation in self.simulations:
@@ -125,6 +129,7 @@ class FixedFoodNeatTraining(Training):
 			"eating-number" : self.eating_number,
 			"max-time-steps" : self.max_time_steps,
 			"n-food" : self.n_food,
+			"simulation-type" : self.simulation_type,
 			"simulations" : {
 				gen_id : {
 					sim_id : sim[0].to_dict() for sim_id, sim in gen.items()
