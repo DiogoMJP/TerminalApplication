@@ -1,6 +1,8 @@
 from src.simulation		import create_simulation
 from src.training		import create_training, Training
 
+import matplotlib
+matplotlib.use('Agg')
 import json
 import matplotlib.pyplot as plt
 import textwrap
@@ -24,8 +26,8 @@ DEFAULT_PARAMS = {
 	"max-time-steps"			: 2000,
 	"config-file"				: None,
 	"perception-processor-type"	: None,
-	"food-spawn-rate"			: 0.01,
-	"n-food"					: 3
+	"food-spawn-rate"			: 0.015,
+	"n-food"					: 2
 }
 
 TRAINING_TYPES = ["random-food-neat-training", "fixed-food-neat-training"]
@@ -97,8 +99,9 @@ class TerminalApplication(object):
 		end = time()
 		print(f"Training took {end - start:.2f} seconds")
 		average_performance, max_performance = self.get_training_result_performance(training)
-		Path(f"saved_data/{training_type}/{config_file}/{eating_number}.json").unlink(missing_ok=True)
 		Path(f"saved_data/{training_type}/{config_file}").mkdir(parents=True, exist_ok=True)
+		for suffix in (".json", "_duration.png", "_fitness.png", "_food.png", "_nodes.png"):
+			Path(f"saved_data/{training_type}/{config_file}/{eating_number}{suffix}").unlink(missing_ok=True)
 		with open(f"saved_data/{training_type}/{config_file}/{eating_number}.json", "w+") as fp:
 			json.dump(training.to_dict() | {
 				"duration" : end - start,
@@ -106,6 +109,7 @@ class TerminalApplication(object):
 				"max-performance" : max_performance
 			}, fp, separators=(',', ':'))
 		print(f"Average Performance: {average_performance}, Maximum Performance: {max_performance}")
+		del training
 
 	def get_training_result_performance(self, training: Training) -> None:
 		brain = training.brain
@@ -119,6 +123,7 @@ class TerminalApplication(object):
 		while not all([sim.finished for sim in simulations]):
 			pass
 		durations = [sim.last_time_step for sim in simulations]
+		for sim in simulations: del sim
 		return sum(durations)/len(durations), max(durations)
 	
 	def generate_average_performance_graph(self, training_type: str) -> None:
@@ -130,7 +135,7 @@ class TerminalApplication(object):
 				config_name = " ".join(config.name.split("_")[1:])
 				if config_name not in vals: vals[config_name] = {}
 				for file in config.iterdir():
-					if file.is_file():
+					if file.is_file() and file.name.endswith(".json"):
 						agent_name = file.name.split(".")[0]
 						if agent_name not in agents: agents += (agent_name,)
 						with open(file, "r") as fp:
@@ -208,6 +213,36 @@ class TerminalApplication(object):
 		plt.ylabel("Average Duration (time steps)")
 		plt.title("Average Duration of Simulations Over Generations")
 		plt.savefig(file_name.replace(".json", "_duration.png"))
+	
+	def create_food_plot(self, training_type: str, config_file: str, eating_number: int) -> None:
+		file_name = f"saved_data/{training_type}/{config_file}/{eating_number}.json"
+		with open(file_name, "r") as fp:
+			data = json.load(fp)
+		time_step_data = [sum([
+			sum([
+				len([
+					1 for food in sim["food"]
+					if food["first-time-step"] <= i and food["last-time-step"] > i
+				])
+				for sim in gen.values()
+			]) for _, gen in data["simulations"].items()]) / sum([
+					len([1 for sim in gen.values()
+						if sim["duration"] > i
+					])
+				for _, gen in data["simulations"].items()
+			])
+			for i in range(max([
+					max([sim["duration"] for sim in gen.values()])
+				for _, gen in data["simulations"].items()
+			]))
+		]
+		_, ax = plt.subplots()
+		ax.plot([i for i in range(len(time_step_data))], time_step_data)
+		plt.xlabel("Time Step")
+		plt.ylabel("Average Amount of Food")
+		plt.title("Average Amount of Food Over Each Time Step")
+		plt.savefig(file_name.replace(".json", "_food.png"))
+		plt.close('all')
 
 	def create_graph_from_training_data(self, training_type: str, config_file: str, eating_number: int) -> None:
 		print()
@@ -215,4 +250,5 @@ class TerminalApplication(object):
 		self.create_fitness_plot(training_type, config_file, eating_number)
 		self.create_node_plot(training_type, config_file, eating_number)
 		self.create_duration_plot(training_type, config_file, eating_number)
+		self.create_food_plot(training_type, config_file, eating_number)
 		plt.close('all')
