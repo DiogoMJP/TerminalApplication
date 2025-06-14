@@ -57,9 +57,10 @@ def remove_directory_tree(start_directory: Path) -> None:
 	start_directory.rmdir()
 
 def wrap_labels(ax, labels, width, break_long_words=False):
-    for i, label in enumerate(labels):
-        labels[i] = textwrap.fill(label, width=width, break_long_words=break_long_words)
-    ax.set_xticklabels(labels, rotation=0)
+	ax.set_xticks(labels)
+	for i, label in enumerate(labels):
+		labels[i] = textwrap.fill(label, width=width, break_long_words=break_long_words)
+	ax.set_xticklabels(labels, rotation=0)
 
 
 class TerminalApplication(object):
