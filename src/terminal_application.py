@@ -81,8 +81,10 @@ class TerminalApplication(object):
 						raise Exception(f"{self.__class__.__name__}: Invalid parameter: {key}")
 					else: self.params[key] = val
 				for eating_number in self.eating_numbers:
-					self.train(training_type, config_file, eating_number)
-			self.generate_average_performance_graph(training_type)
+					# self.train(training_type, config_file, eating_number)
+					self.create_graph_from_training_data(training_type, config_file, eating_number)
+			# self.generate_average_performance_graph(training_type)
+		print()
 		print("Training completed.")
 	
 	def train(self, training_type: str, config_file: str, eating_number: int) -> None:
@@ -134,6 +136,7 @@ class TerminalApplication(object):
 						if agent_name not in agents: agents += (agent_name,)
 						with open(file, "r") as fp:
 							vals[config_name][agent_name] = json.load(fp)["average-performance"]
+		print()
 		print(f"Training {training_type} average performance: {vals}")
 		fig, ax = plt.subplots(layout="constrained")
 		for i in agents:
@@ -142,3 +145,75 @@ class TerminalApplication(object):
 		ax.legend()
 		fig.suptitle("Average agent performance")
 		fig.savefig(f"saved_data/{training_type}/average_performance.png")
+		plt.close('all')
+	
+	def create_fitness_plot(self, training_type: str, config_file: str, eating_number: int) -> None:
+		file_name = f"saved_data/{training_type}/{config_file}/{eating_number}.json"
+		with open(file_name, "r") as fp:
+			data = json.load(fp)
+		fitness_data = [
+			sum([
+				sum([1 for food in sim["food"] if food["eaten"]])
+				for sim in gen.values()
+			]) / len(gen.values())
+			for _, gen in data["simulations"].items()
+		]
+		_, ax = plt.subplots()
+		ax.plot([i for i in range(len(fitness_data))], fitness_data)
+		plt.xlabel("Generation")
+		plt.ylabel("Average Fitness")
+		plt.title("Average Fitness Over Generations")
+		plt.savefig(file_name.replace(".json", "_fitness.png"))
+
+	def create_node_plot(self, training_type: str, config_file: str, eating_number: int) -> None:
+		file_name = f"saved_data/{training_type}/{config_file}/{eating_number}.json"
+		with open(file_name, "r") as fp:
+			data = json.load(fp)
+		node_data = [
+			sum([
+				len(sim["brain"]["network"]["node-evals"]) +
+				len(sim["brain"]["network"]["inputs"])
+				for sim in gen.values()
+			]) / len(gen.values())
+			for _, gen in data["simulations"].items()
+		]
+		_, ax = plt.subplots()
+		ax.plot([i for i in range(len(node_data))], node_data)
+		plt.xlabel("Generation")
+		plt.ylabel("Average Number of Nodes")
+		plt.title("Average Number of Nodes Over Generations")
+		plt.savefig(file_name.replace(".json", "_nodes.png"))
+
+	def create_duration_plot(self, training_type: str, config_file: str, eating_number: int) -> None:
+		# simulation_data = []
+		# for _, gen in data["simulations"].items():
+		# 	sim = [
+		# 		sim["duration"]
+		# 		for sim in gen.values()
+		# 	]
+		# 	sim.sort(reverse=True)
+		# 	simulation_data += [sim[:10]]
+		# duration_data = [sum(sim) / len(sim) for sim in simulation_data]
+		file_name = f"saved_data/{training_type}/{config_file}/{eating_number}.json"
+		with open(file_name, "r") as fp:
+			data = json.load(fp)
+		duration_data = [
+			sum([
+				sim["duration"] for sim in gen.values()
+			]) / len(gen.values())
+			for _, gen in data["simulations"].items()
+		]
+		_, ax = plt.subplots()
+		ax.plot([i for i in range(len(duration_data))], duration_data)
+		plt.xlabel("Generation")
+		plt.ylabel("Average Duration (time steps)")
+		plt.title("Average Duration of Simulations Over Generations")
+		plt.savefig(file_name.replace(".json", "_duration.png"))
+
+	def create_graph_from_training_data(self, training_type: str, config_file: str, eating_number: int) -> None:
+		print()
+		print(f"Generating graphs for training {training_type} with config {config_file} and eating number {eating_number}")
+		self.create_fitness_plot(training_type, config_file, eating_number)
+		self.create_node_plot(training_type, config_file, eating_number)
+		self.create_duration_plot(training_type, config_file, eating_number)
+		plt.close('all')
