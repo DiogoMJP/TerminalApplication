@@ -80,9 +80,9 @@ class TerminalApplication(object):
 						raise Exception(f"{self.__class__.__name__}: Invalid parameter: {key}")
 					else: self.params[key] = val
 				for eating_number in self.eating_numbers:
-					# self.train(training_type, config_file, eating_number)
+					self.train(training_type, config_file, eating_number)
 					self.create_graph_from_training_data(training_type, config_file, eating_number)
-			# self.generate_average_performance_graph(training_type)
+			self.generate_average_performance_graph(training_type)
 		print()
 		print("Training completed.")
 	
