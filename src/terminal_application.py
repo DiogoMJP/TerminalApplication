@@ -1,4 +1,3 @@
-from src.agent.brain	import load_brain_from_data
 from src.simulation		import create_simulation
 from src.training		import create_training, Training
 
