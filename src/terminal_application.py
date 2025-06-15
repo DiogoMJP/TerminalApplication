@@ -13,21 +13,21 @@ from typing import Any, Dict, List
 
 DEFAULT_PARAMS = {
 	"n-generations"				: 25,
-	"width"						: 400,
-	"height"					: 400,
+	"width"						: 1000,
+	"height"					: 1000,
 	"n-agents"					: 15,
 	"agent-type"				: "default-agent",
 	"agents-lifespan"			: 350,
 	"agents-lifespan-extension"	: 350,
 	"food-lifespan"				: 350,
-	"perception-distance"		: 100,
+	"perception-distance"		: 200,
 	"eating-distance"			: 15,
 	"eating-number"				: None,
-	"max-time-steps"			: 2000,
+	"max-time-steps"			: 3500,
 	"config-file"				: None,
 	"perception-processor-type"	: None,
-	"food-spawn-rate"			: 0.015,
-	"n-food"					: 2
+	"food-spawn-rate"			: 0.03,
+	"n-food"					: 4
 }
 
 TRAINING_TYPES = ["random-food-neat-training", "fixed-food-neat-training"]
