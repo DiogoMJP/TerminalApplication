@@ -7,7 +7,6 @@ from typing 	import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.agent.brain	import Brain
-	from src.food			import Food
 
 
 class FixedFoodSimulation(Simulation):

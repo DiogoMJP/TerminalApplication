@@ -16,8 +16,8 @@ class DefaultAgent(Agent):
 			eating_distance, {"x": None, "y": None, "angle": None}
 		)
 
-	def set_history(self, history: list[tuple[Any]]) -> None:
-		super().set_history(history, ["x", "y", "angle"])
+	def set_history(self, history: list[tuple[Any]], keys: list[str] = ["x", "y", "angle"]) -> None:
+		super().set_history(history, keys)
 
 	def simulate(self, time_step: int, food_list: list[Food], agent_list: list[Agent]) -> None:
 		if self.alive:

@@ -13,7 +13,6 @@ if TYPE_CHECKING:
 	from src.simulation		import Simulation
 
 
-
 class FixedFoodNeatTraining(Training):
 	def __init__(
 		self, n_generations: int, width: int, height: int, n_agents: int, agent_type: str,
