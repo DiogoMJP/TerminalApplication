@@ -27,23 +27,33 @@ DEFAULT_PARAMS = {
 	"config-file"				: None,
 	"perception-processor-type"	: None,
 	"food-spawn-rate"			: 0.03,
-	"n-food"					: 4
+	"n-food"					: 4,
+	"n-sensors"					: 5,
+	"fov"						: 160
 }
 
-TRAINING_TYPES = ["random-food-neat-training", "fixed-food-neat-training"]
+TRAINING_TYPES = [
+	# "random-food-neat-training",
+	# "fixed-food-neat-training",
+	"eyes-neat-training"
+]
 
 CONFIGS = [
-	("01_starting_config", {
-		"perception-processor-type" : "food-agent-distance-perception-processor"
-	}),
-	("02_weight_range_change_config", {
-		"perception-processor-type" : "food-agent-distance-perception-processor"
-	}),
-	("03_weight_params_change_config", {
-		"perception-processor-type" : "food-agent-distance-perception-processor"
-	}),
-	("04_normalise_input_config", {
-		"perception-processor-type" : "normalised-input-perception-processor"
+	# ("01_starting_config", {
+	# 	"perception-processor-type" : "food-agent-distance-perception-processor"
+	# }),
+	# ("02_weight_range_change_config", {
+	# 	"perception-processor-type" : "food-agent-distance-perception-processor"
+	# }),
+	# ("03_weight_params_change_config", {
+	# 	"perception-processor-type" : "food-agent-distance-perception-processor"
+	# }),
+	# ("04_normalise_input_config", {
+	# 	"perception-processor-type" : "normalised-input-perception-processor"
+	# }),
+	("05_eyes_implementation_config", {
+		"perception-processor-type" : "eyes-perception-processor",
+		"perception-distance"		: 400
 	})
 ]
 
@@ -111,8 +121,10 @@ class TerminalApplication(object):
 		print(f"Average Performance: {average_performance}, Maximum Performance: {max_performance}")
 		del training
 
-	def get_training_result_performance(self, training: Training) -> None:
+	def get_training_result_performance(self, training: Training) -> tuple[float, float]:
 		brain = training.brain
+		if brain == None:
+			raise Exception(f"{self.__class__.__name__}: get_training_result_performance: Training has not been completed")
 		simulations = []
 		for _ in range(50):
 			sim = create_simulation(

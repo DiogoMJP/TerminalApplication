@@ -19,7 +19,7 @@ class NeatNeuralNetwork(NeuralNetwork):
 	def sigmoid(self, x: float) -> float:
 		return sigmoid(x)
 
-	def activate(self, inputs: tuple[float]) -> list[float]:
+	def activate(self, inputs: tuple[float, ...]) -> list[float]:
 		if len(self.inputs) != len(inputs):
 			raise RuntimeError("Expected {0:n} inputs, got {1:n}".format(len(self.inputs), len(inputs)))
 

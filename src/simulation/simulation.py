@@ -39,6 +39,7 @@ class Simulation(CreatableFromParameters):
 		self.time_step			: int			= 0
 		self.agents				: list[Agent]	= []
 		self.food				: list[Food]	= []
+		self.finished_food		: list[Food]	= []
 		self.main_loop_thread	: Thread | None	= None
 
 	def get_n_alive_agents(self) -> int:
@@ -60,6 +61,10 @@ class Simulation(CreatableFromParameters):
 	def create_food(self) -> None:
 		params = self.generate_food_parameters()
 		self.food += [create_food("default-food", params)]
+	def separate_food(self) -> None:
+		dead_food = [food for food in self.food if not food.alive]
+		self.finished_food += dead_food
+		self.food = [food for food in self.food if food.alive]
 	
 	def start_loop(self) -> None:
 		if not self.finished:

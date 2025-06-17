@@ -16,10 +16,13 @@ class Brain(CreatableFromParameters):
 		self.n_output				: int					= n_output
 		self.perception_processor	: PerceptionProcessor	= perception_processor
 
+	def get_closest_food(self, state: dict[str, Any], food_list: list[Food]) -> tuple[Food | None, float]:
+		return self.perception_processor.get_closest_food(state, food_list)
+
 	@abstractmethod
 	def get_action(
 		self, state: dict[str, Any], perception_distance: int, food_list: list[Food], agent_list: list[Agent]
-	) -> tuple[Any, ...]:
+	) -> tuple[int, ...]:
 		raise NotImplementedError(f"{self.__class__.__name__}: get_action method must be implemented in subclasses")
 
 	@abstractmethod

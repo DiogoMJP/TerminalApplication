@@ -2,10 +2,12 @@ from __future__	import annotations
 
 from src.simulation	import Simulation
 
-from typing import Any, TYPE_CHECKING
+from time		import time
+from typing 	import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.agent.brain	import Brain
+	from src.food			import Food
 
 
 class FixedFoodSimulation(Simulation):
@@ -31,8 +33,9 @@ class FixedFoodSimulation(Simulation):
 				self.last_time_step = self.time_step
 			for food in self.food:
 				food.simulate(self.time_step)
-			for agent in self.agents:
-				agent.simulate(self.time_step, self.food, self.agents)
+			self.separate_food()
+			for i, agent in enumerate(self.agents):
+				agent.simulate(self.time_step, self.food, self.agents[:i]+self.agents[i+1:])
 			while self.get_n_food() < self.n_food:
 				self.create_food()
 			self.time_step += 1
@@ -40,6 +43,7 @@ class FixedFoodSimulation(Simulation):
 			if agent.last_time_step == None: agent.last_time_step = self.time_step
 		for food in self.food:
 			if food.last_time_step == None: food.last_time_step = self.time_step
+			self.finished_food += [food]
 	
 	def to_dict(self) -> dict[str, Any]:
 		return {
@@ -47,7 +51,7 @@ class FixedFoodSimulation(Simulation):
 			"duration" : self.last_time_step,
 			"brain" : self.brain.to_dict(),
 			"agents" : [agent.to_dict() for agent in self.agents],
-			"food" : [food.to_dict() for food in self.food]
+			"food" : [food.to_dict() for food in self.finished_food]
 		}
 	
 	@staticmethod

@@ -30,8 +30,9 @@ class RandomFoodSimulation(Simulation):
 				self.last_time_step = self.time_step
 			for food in self.food:
 				food.simulate(self.time_step)
-			for agent in self.agents:
-				agent.simulate(self.time_step, self.food, self.agents)
+			self.separate_food()
+			for i, agent in enumerate(self.agents):
+				agent.simulate(self.time_step, self.food, self.agents[:i]+self.agents[i+1:])
 			if random() < self.food_spawn_rate:
 				self.create_food()
 			self.time_step += 1
@@ -39,6 +40,7 @@ class RandomFoodSimulation(Simulation):
 			if agent.last_time_step == None: agent.last_time_step = self.time_step
 		for food in self.food:
 			if food.last_time_step == None: food.last_time_step = self.time_step
+			self.finished_food += [food]
 	
 	def to_dict(self) -> dict[str, Any]:
 		return {
@@ -46,7 +48,7 @@ class RandomFoodSimulation(Simulation):
 			"duration" : self.last_time_step,
 			"brain" : self.brain.to_dict(),
 			"agents" : [agent.to_dict() for agent in self.agents],
-			"food" : [food.to_dict() for food in self.food]
+			"food" : [food.to_dict() for food in self.finished_food]
 		}
 	
 	@staticmethod

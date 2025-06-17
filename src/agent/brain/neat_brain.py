@@ -19,19 +19,15 @@ class NeatBrain(Brain):
 	
 	def get_action(
 		self, state: dict[str, Any], perception_distance: int, food_list: list[Food], agent_list: list[Agent]
-	) -> tuple[int, int, int, float, Food|None]:
+	) -> tuple[int, int, int]:
 		input = self.perception_processor.process_input(state, perception_distance, food_list, agent_list)
-		
-		food = input[0]
-		f_dist = input[2]
-		input = input[1:]
 		
 		output = self.neat_net.activate(input)
 		l_rot = 1 if output[0] >= 0.5 else 0
 		r_rot = 1 if output[1] >= 0.5 else 0
 		speed = 1 if output[2] >= 0.5 else 0
 		
-		return (l_rot, r_rot, speed, f_dist, food)
+		return (l_rot, r_rot, speed)
 	
 
 	def to_dict(self) -> dict[str, Any]:

@@ -2,7 +2,7 @@ from __future__	import annotations
 
 from src.agent.brain.perception_processors	import PerceptionProcessor
 
-from math	import atan2, degrees, sqrt
+from math	import atan2, degrees, hypot
 from typing	import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -16,30 +16,19 @@ class FoodDistancePerceptionProcessor(PerceptionProcessor):
 	
 	def process_input(
 		self, state: dict[str, Any], perception_distance: int, food_list: list[Food], agent_list: list[Agent]
-	) -> tuple[Food | None, float, float]:
-		x = state["x"]; y = state["y"]
-		closest_x = None; closest_y = None; dist = None; closest = None
+	) -> tuple[float, float]:
+		x = state["x"]; y = state["y"]; angle = state["angle"]
+		output = [180.0, 2.0 * perception_distance, 180.0, 2.0 * perception_distance]
 		
 		for food in food_list:
 			if food.alive:
-				if dist == None:
-					dist = (x-food.x)**2 + (y-food.y)**2
-					closest_x = food.x; closest_y = food.y
-					closest = food
-				else:
-					d = (x-food.x)**2 + (y-food.y)**2
-					if d < dist:
-						dist = d
-						closest_x = food.x; closest_y = food.y
-						closest = food
+				dx = food.x - x; dy = food.y - y
+				dist = hypot(dx, dy)
+				if dist <= perception_distance and dist < output[1]:
+					output[0] = (degrees(atan2(dy, dx)) - angle + 180) % 360 - 180
+					output[1] = dist
 		
-		if dist == None:
-			return (None, 500, 500)
-
-		dist = sqrt(dist)
-		angle = (degrees(atan2(closest_y - y, closest_x - x)) - state["angle"] + 180) % 360 - 180
-		return (closest, angle, dist) if dist < perception_distance else (None, 500, 500)
-	
+		return (output[0], output[1])
 	
 	def to_dict(self) -> dict[str, Any]:
 		return {"type" : "food-distance-perception-processor"}
@@ -50,4 +39,8 @@ class FoodDistancePerceptionProcessor(PerceptionProcessor):
 	
 	@staticmethod
 	def create_from_parameters(params: dict[str, Any]) -> 'FoodDistancePerceptionProcessor':
+		return FoodDistancePerceptionProcessor()
+
+	@staticmethod
+	def load_from_data(data: dict[str, Any]) -> 'FoodDistancePerceptionProcessor':
 		return FoodDistancePerceptionProcessor()
