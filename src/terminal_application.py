@@ -26,15 +26,16 @@ DEFAULT_PARAMS = {
 	"max-time-steps"			: 3500,
 	"config-file"				: None,
 	"perception-processor-type"	: None,
+	"simulation-type"			: None,
 	"food-spawn-rate"			: 0.03,
 	"n-food"					: 4,
 	"n-sensors"					: 5,
 	"fov"						: 160
 }
 
-TRAINING_TYPES = [
-	"random-food-neat-training",
-	"fixed-food-neat-training"
+SIMULATION_TYPES = [
+	"random-food-simulation",
+	"fixed-food-simulation"
 ]
 
 CONFIGS = [
@@ -76,42 +77,43 @@ def wrap_labels(ax, labels, width, break_long_words=False):
 class TerminalApplication(object):
 	def __init__(self):
 		# remove_directory_tree(Path("saved_data"))
-		self.params			: Dict[str, Any]					= dict(DEFAULT_PARAMS)
-		self.training_types	: List[str]							= list(TRAINING_TYPES)
-		self.config_files	: list[tuple[str, dict[str, Any]]]	= [
+		self.params				: Dict[str, Any]					= dict(DEFAULT_PARAMS)
+		self.simulation_types	: List[str]							= list(SIMULATION_TYPES)
+		self.config_files		: list[tuple[str, dict[str, Any]]]	= [
 			(config[0], dict(config[1])) for config in CONFIGS
 		]
-		self.eating_numbers	: List[int]							= list(EATING_NUMBERS)
+		self.eating_numbers		: List[int]							= list(EATING_NUMBERS)
 
 	def main(self) -> None:
-		for training_type in self.training_types:
+		for simulation_type in self.simulation_types:
 			for config_file, params in self.config_files:
 				for key, val in params.items():
 					if key not in self.params.keys():
 						raise Exception(f"{self.__class__.__name__}: Invalid parameter: {key}")
 					else: self.params[key] = val
 				for eating_number in self.eating_numbers:
-					self.train(training_type, config_file, eating_number)
-					self.create_graph_from_training_data(training_type, config_file, eating_number)
-			self.generate_average_performance_graph(training_type)
+					self.train(simulation_type, config_file, eating_number)
+					self.create_graph_from_training_data(simulation_type, config_file, eating_number)
+			self.generate_average_performance_graph(simulation_type)
 		print()
 		print("Training completed.")
 	
-	def train(self, training_type: str, config_file: str, eating_number: int) -> None:
+	def train(self, simulation_type: str, config_file: str, eating_number: int) -> None:
 		print()
+		self.params["simulation-type"] = simulation_type
 		self.params["config-file"] = f"config_files/{config_file}"
 		self.params["eating-number"] = eating_number
-		print(f"Running training {training_type} with config {config_file} and eating number {eating_number} and configs {self.params}")
+		print(f"Running simulation {simulation_type} with config {config_file} and eating number {eating_number} and configs {self.params}")
 		start = time()
-		training = create_training(training_type, self.params)
+		training = create_training("neat-training", self.params)
 		training.start_training()
 		end = time()
 		print(f"Training took {end - start:.2f} seconds")
 		average_performance, max_performance = self.get_training_result_performance(training)
-		Path(f"saved_data/{training_type}/{config_file}").mkdir(parents=True, exist_ok=True)
+		Path(f"saved_data/{simulation_type}/{config_file}").mkdir(parents=True, exist_ok=True)
 		for suffix in (".json", "_duration.png", "_fitness.png", "_food.png", "_nodes.png"):
-			Path(f"saved_data/{training_type}/{config_file}/{eating_number}{suffix}").unlink(missing_ok=True)
-		with open(f"saved_data/{training_type}/{config_file}/{eating_number}.json", "w+") as fp:
+			Path(f"saved_data/{simulation_type}/{config_file}/{eating_number}{suffix}").unlink(missing_ok=True)
+		with open(f"saved_data/{simulation_type}/{config_file}/{eating_number}.json", "w+") as fp:
 			json.dump(training.to_dict() | {
 				"duration" : end - start,
 				"average-performance" : average_performance,
@@ -137,8 +139,8 @@ class TerminalApplication(object):
 		for sim in simulations: del sim
 		return sum(durations)/len(durations), max(durations)
 	
-	def generate_average_performance_graph(self, training_type: str) -> None:
-		start_directory = Path(f"saved_data/{training_type}")
+	def generate_average_performance_graph(self, simulation_type: str) -> None:
+		start_directory = Path(f"saved_data/{simulation_type}")
 		vals = {}
 		agents = ()
 		for config in start_directory.iterdir():
@@ -152,18 +154,18 @@ class TerminalApplication(object):
 						with open(file, "r") as fp:
 							vals[config_name][agent_name] = json.load(fp)["average-performance"]
 		print()
-		print(f"Training {training_type} average performance: {vals}")
+		print(f"Simulation {simulation_type} average performance: {vals}")
 		fig, ax = plt.subplots(layout="constrained")
 		for i in agents:
 			ax.plot(vals.keys(), [vals[key][i] for key in vals.keys()], label=f"{i}")
 		wrap_labels(ax, list(vals.keys()), 20)
 		ax.legend()
 		fig.suptitle("Average agent performance")
-		fig.savefig(f"saved_data/{training_type}/average_performance.png")
+		fig.savefig(f"saved_data/{simulation_type}/average_performance.png")
 		plt.close('all')
 	
-	def create_fitness_plot(self, training_type: str, config_file: str, eating_number: int) -> None:
-		file_name = f"saved_data/{training_type}/{config_file}/{eating_number}.json"
+	def create_fitness_plot(self, simulation_type: str, config_file: str, eating_number: int) -> None:
+		file_name = f"saved_data/{simulation_type}/{config_file}/{eating_number}.json"
 		with open(file_name, "r") as fp:
 			data = json.load(fp)
 		fitness_data = [
@@ -180,8 +182,8 @@ class TerminalApplication(object):
 		plt.title("Average Fitness Over Generations")
 		plt.savefig(file_name.replace(".json", "_fitness.png"))
 
-	def create_node_plot(self, training_type: str, config_file: str, eating_number: int) -> None:
-		file_name = f"saved_data/{training_type}/{config_file}/{eating_number}.json"
+	def create_node_plot(self, simulation_type: str, config_file: str, eating_number: int) -> None:
+		file_name = f"saved_data/{simulation_type}/{config_file}/{eating_number}.json"
 		with open(file_name, "r") as fp:
 			data = json.load(fp)
 		node_data = [
@@ -199,7 +201,7 @@ class TerminalApplication(object):
 		plt.title("Average Number of Nodes Over Generations")
 		plt.savefig(file_name.replace(".json", "_nodes.png"))
 
-	def create_duration_plot(self, training_type: str, config_file: str, eating_number: int) -> None:
+	def create_duration_plot(self, simulation_type: str, config_file: str, eating_number: int) -> None:
 		# simulation_data = []
 		# for _, gen in data["simulations"].items():
 		# 	sim = [
@@ -209,7 +211,7 @@ class TerminalApplication(object):
 		# 	sim.sort(reverse=True)
 		# 	simulation_data += [sim[:10]]
 		# duration_data = [sum(sim) / len(sim) for sim in simulation_data]
-		file_name = f"saved_data/{training_type}/{config_file}/{eating_number}.json"
+		file_name = f"saved_data/{simulation_type}/{config_file}/{eating_number}.json"
 		with open(file_name, "r") as fp:
 			data = json.load(fp)
 		duration_data = [
@@ -225,8 +227,8 @@ class TerminalApplication(object):
 		plt.title("Average Duration of Simulations Over Generations")
 		plt.savefig(file_name.replace(".json", "_duration.png"))
 	
-	def create_food_plot(self, training_type: str, config_file: str, eating_number: int) -> None:
-		file_name = f"saved_data/{training_type}/{config_file}/{eating_number}.json"
+	def create_food_plot(self, simulation_type: str, config_file: str, eating_number: int) -> None:
+		file_name = f"saved_data/{simulation_type}/{config_file}/{eating_number}.json"
 		with open(file_name, "r") as fp:
 			data = json.load(fp)
 		time_step_data = [sum([
@@ -255,11 +257,11 @@ class TerminalApplication(object):
 		plt.savefig(file_name.replace(".json", "_food.png"))
 		plt.close('all')
 
-	def create_graph_from_training_data(self, training_type: str, config_file: str, eating_number: int) -> None:
+	def create_graph_from_training_data(self, simulation_type: str, config_file: str, eating_number: int) -> None:
 		print()
-		print(f"Generating graphs for training {training_type} with config {config_file} and eating number {eating_number}")
-		self.create_fitness_plot(training_type, config_file, eating_number)
-		self.create_node_plot(training_type, config_file, eating_number)
-		self.create_duration_plot(training_type, config_file, eating_number)
-		self.create_food_plot(training_type, config_file, eating_number)
+		print(f"Generating graphs for training {simulation_type} with config {config_file} and eating number {eating_number}")
+		self.create_fitness_plot(simulation_type, config_file, eating_number)
+		self.create_node_plot(simulation_type, config_file, eating_number)
+		self.create_duration_plot(simulation_type, config_file, eating_number)
+		self.create_food_plot(simulation_type, config_file, eating_number)
 		plt.close('all')

@@ -13,20 +13,19 @@ if TYPE_CHECKING:
 	from src.simulation		import Simulation
 
 
-class RandomFoodNeatTraining(Training):
+class NeatTraining(Training):
 	def __init__(
 		self, n_generations: int, width: int, height: int, n_agents: int, agent_type: str,
 		agents_lifespan: int, agents_lifespan_extension: int, food_lifespan: int,
 		perception_distance: int, eating_distance: int, eating_number: int, max_time_steps: int,
-		config_file: str, perception_processor_type: str, food_spawn_rate: float, 
+		config_file: str, perception_processor_type: str, simulation_type: str
 	):
 		super().__init__(
 			n_generations, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
 			food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps, 
-		perception_processor_type, "random-food-simulation"
+		perception_processor_type, simulation_type
 		)
 		self.config_file				: str	= config_file
-		self.food_spawn_rate			: float	= food_spawn_rate
 
 		self.config_params				: dict[str, Any]											= {}
 		self.simulations 				: dict[str, dict[str, tuple[Simulation, DefaultGenome]]]	= {}
@@ -79,7 +78,7 @@ class RandomFoodNeatTraining(Training):
 				"perception-processor-type" : self.perception_processor_type,
 				"neat-neural-network" : neat.nn.FeedForwardNetwork.create(genome, config)
 			} | self.generate_perception_processor_parameter()) 
-			sim = create_simulation("random-food-simulation", self.generate_simulation_parameters(brain))
+			sim = create_simulation(self.simulation_type, self.generate_simulation_parameters(brain))
 			self.simulations[str(self.generation)][str(id)] = (sim, genome)
 		while not all([sim.finished for sim, _ in self.simulations[str(self.generation)].values()]):
 			pass
@@ -87,23 +86,6 @@ class RandomFoodNeatTraining(Training):
 			pair[1].fitness = pair[0].get_n_eaten_food()
 
 		self.generation += 1
-
-	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:
-		return {
-			"brain" : brain,
-			"width" : self.width,
-			"height" : self.height,
-			"n-agents" : self.n_agents,
-			"agent-type" : self.agent_type,
-			"agents-lifespan" : self.agents_lifespan,
-			"agents-lifespan-extension" : self.agents_lifespan_extension,
-			"food-lifespan" : self.food_lifespan,
-			"perception-distance" : self.perception_distance,
-			"eating-distance" : self.eating_distance,
-			"eating-number" : self.eating_number,
-			"max-time-steps" : self.max_time_steps,
-			"food-spawn-rate" : self.food_spawn_rate
-		}
 
 	def get_simulation(self, generation: str, simulation: str) -> Simulation|None:
 		if generation in self.simulations:
@@ -114,15 +96,15 @@ class RandomFoodNeatTraining(Training):
 	
 	def to_dict(self) -> dict[str, Any]:
 		return {
-			"type" : "random-food-neat-training",
-			"config-file" : self.config_file,
-			"food-spawn-rate" : self.food_spawn_rate,
-			"simulations" : {
+			"type"				: "neat-training",
+			"config-file"		: self.config_file,
+			"food-spawn-rate"	: self.food_spawn_rate,
+			"simulations"		: {
 				gen_id : {
 					sim_id : sim[0].to_dict() for sim_id, sim in gen.items()
 				} for gen_id, gen in self.simulations.items()
 			},
-			"config-params" : self.config_params
+			"config-params"		: self.config_params
 		} | super().to_dict()
 	
 	@staticmethod
@@ -130,20 +112,22 @@ class RandomFoodNeatTraining(Training):
 		return (
 			"n-generations", "width", "height", "n-agents", "agent-type", "agents-lifespan",
 			"agents-lifespan-extension", "food-lifespan", "perception-distance", "eating-distance",
-			"eating-number", "max-time-steps", "config-file", "perception-processor-type", "food-spawn-rate"
+			"eating-number", "max-time-steps", "config-file", "perception-processor-type", "simulation-type"
 		)
 	
 	@staticmethod
-	def create_from_parameters(params: dict[str, Any]) -> 'RandomFoodNeatTraining':
+	def create_from_parameters(params: dict[str, Any]) -> 'NeatTraining':
 		for key in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"Missing required parameter: {key}")
-		training = RandomFoodNeatTraining(
+		training = NeatTraining(
 			params["n-generations"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-lifespan"],
 			params["perception-distance"], params["eating-distance"], params["eating-number"], params["max-time-steps"],
-			params["config-file"], params["perception-processor-type"], params["food-spawn-rate"]
+			params["config-file"], params["perception-processor-type"], params["simulation-type"]
 		)
+		if "food-spawn-rate" in params: training.food_spawn_rate = params["food-spawn-rate"]
+		if "n-food" in params: training.n_food = params["n-food"]
 		if "n-sensors" in params: training.n_sensors = params["n-sensors"]
 		if "fov" in params: training.fov = params["fov"]
 		return training

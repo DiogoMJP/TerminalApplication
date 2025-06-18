@@ -26,7 +26,6 @@ class FixedFoodNeatTraining(Training):
 			perception_processor_type, "fixed-food-simulation"
 		)
 		self.config_file				: str	= config_file
-		self.n_food						: float	= n_food
 
 		self.config_params				: dict[str, Any]											= {}
 		self.simulations 				: dict[str, dict[str, tuple[Simulation, DefaultGenome]]]	= {}
