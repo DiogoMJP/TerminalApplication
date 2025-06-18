@@ -22,10 +22,10 @@ class FixedFoodNeatTraining(Training):
 	):
 		super().__init__(
 			n_generations, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
-			food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps, "fixed-food-simulation"
+			food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps,
+			perception_processor_type, "fixed-food-simulation"
 		)
 		self.config_file				: str	= config_file
-		self.perception_processor_type	: str	= perception_processor_type
 		self.n_food						: float	= n_food
 
 		self.config_params				: dict[str, Any]											= {}
@@ -67,7 +67,7 @@ class FixedFoodNeatTraining(Training):
 		self.brain = create_brain("neat-brain", {
 			"perception-processor-type" : self.perception_processor_type,
 			"neat-neural-network" : neat.nn.FeedForwardNetwork.create(winner, config)
-		})
+		} | self.generate_perception_processor_parameter()) 
 	
 	def eval_genomes(
 			self, genomes: list[tuple[int, DefaultGenome]], config: Config
@@ -77,7 +77,7 @@ class FixedFoodNeatTraining(Training):
 			brain = create_brain("neat-brain", {
 				"perception-processor-type" : self.perception_processor_type,
 				"neat-neural-network" : neat.nn.FeedForwardNetwork.create(genome, config)
-			})
+			} | self.generate_perception_processor_parameter()) 
 			sim = create_simulation("fixed-food-simulation", self.generate_simulation_parameters(brain))
 			sim.start_loop()
 			self.simulations[str(self.generation)][str(id)] = (sim, genome)
@@ -114,29 +114,16 @@ class FixedFoodNeatTraining(Training):
 	
 	def to_dict(self) -> dict[str, Any]:
 		return {
-			"type" : "fixed-food-neat-training",
+			"type" : "random-food-neat-training",
 			"config-file" : self.config_file,
-			"n-generations" : self.n_generations,
-			"width" : self.width,
-			"height" : self.height,
-			"n-agents" : self.n_agents,
-			"agents-lifespan" : self.agents_lifespan,
-			"agents-lifespan-extension" : self.agents_lifespan_extension,
-			"food-lifespan" : self.food_lifespan,
-			"perception-distance" : self.perception_distance,
-			"eating-distance" : self.eating_distance,
-			"eating-number" : self.eating_number,
-			"max-time-steps" : self.max_time_steps,
 			"n-food" : self.n_food,
-			"simulation-type" : self.simulation_type,
 			"simulations" : {
 				gen_id : {
 					sim_id : sim[0].to_dict() for sim_id, sim in gen.items()
 				} for gen_id, gen in self.simulations.items()
 			},
-			"brain" : self.brain.to_dict(),
 			"config-params" : self.config_params
-        }
+		} | super().to_dict()
 	
 	@staticmethod
 	def get_parameters() -> tuple[str, ...]:
@@ -151,9 +138,12 @@ class FixedFoodNeatTraining(Training):
 		for key in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"Missing required parameter: {key}")
-		return FixedFoodNeatTraining(
+		training = FixedFoodNeatTraining(
 			params["n-generations"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-lifespan"],
 			params["perception-distance"], params["eating-distance"], params["eating-number"], params["max-time-steps"],
 			params["config-file"], params["perception-processor-type"], params["n-food"]
 		)
+		if "n-sensors" in params: training.n_sensors = params["n-sensors"]
+		if "fov" in params: training.fov = params["fov"]
+		return training

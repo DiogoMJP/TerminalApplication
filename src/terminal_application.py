@@ -33,24 +33,23 @@ DEFAULT_PARAMS = {
 }
 
 TRAINING_TYPES = [
-	# "random-food-neat-training",
-	# "fixed-food-neat-training",
-	"eyes-neat-training"
+	"random-food-neat-training",
+	"fixed-food-neat-training"
 ]
 
 CONFIGS = [
-	# ("01_starting_config", {
-	# 	"perception-processor-type" : "food-agent-distance-perception-processor"
-	# }),
-	# ("02_weight_range_change_config", {
-	# 	"perception-processor-type" : "food-agent-distance-perception-processor"
-	# }),
-	# ("03_weight_params_change_config", {
-	# 	"perception-processor-type" : "food-agent-distance-perception-processor"
-	# }),
-	# ("04_normalise_input_config", {
-	# 	"perception-processor-type" : "normalised-input-perception-processor"
-	# }),
+	("01_starting_config", {
+		"perception-processor-type" : "food-agent-distance-perception-processor"
+	}),
+	("02_weight_range_change_config", {
+		"perception-processor-type" : "food-agent-distance-perception-processor"
+	}),
+	("03_weight_params_change_config", {
+		"perception-processor-type" : "food-agent-distance-perception-processor"
+	}),
+	("04_normalise_input_config", {
+		"perception-processor-type" : "normalised-input-perception-processor"
+	}),
 	("05_eyes_implementation_config", {
 		"perception-processor-type" : "eyes-perception-processor",
 		"perception-distance"		: 400
