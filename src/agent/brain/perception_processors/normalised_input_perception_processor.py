@@ -42,7 +42,7 @@ class NormalisedInputPerceptionProcessor(PerceptionProcessor):
 		return (output[0], output[1], output[2], output[3], output[4], output[5])
 
 	def to_dict(self) -> dict[str, Any]:
-		return {"type" : "normalised-input-perception-processor"}
+		return {"type"	: "normalised-input-perception-processor"}
 	
 	@staticmethod
 	def get_parameters() -> tuple[str, ...]:

@@ -31,7 +31,7 @@ class FoodDistancePerceptionProcessor(PerceptionProcessor):
 		return (output[0], output[1])
 	
 	def to_dict(self) -> dict[str, Any]:
-		return {"type" : "food-distance-perception-processor"}
+		return {"type"	: "food-distance-perception-processor"}
 	
 	@staticmethod
 	def get_parameters() -> tuple[str, ...]:

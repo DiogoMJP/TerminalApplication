@@ -119,7 +119,7 @@ class NeatTraining(Training):
 	def create_from_parameters(params: dict[str, Any]) -> 'NeatTraining':
 		for key in __class__.get_parameters():
 			if key not in params:
-				raise Exception(f"Missing required parameter: {key}")
+				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
 		training = NeatTraining(
 			params["n-generations"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-lifespan"],

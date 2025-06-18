@@ -46,11 +46,11 @@ class FixedFoodSimulation(Simulation):
 	
 	def to_dict(self) -> dict[str, Any]:
 		return {
-			"type" : "fixed-food-simulation",
-			"duration" : self.last_time_step,
-			"brain" : self.brain.to_dict(),
-			"agents" : [agent.to_dict() for agent in self.agents],
-			"food" : [food.to_dict() for food in self.finished_food]
+			"type"		: "fixed-food-simulation",
+			"duration"	: self.last_time_step,
+			"brain"		: self.brain.to_dict(),
+			"agents"	: [agent.to_dict() for agent in self.agents],
+			"food"		: [food.to_dict() for food in self.finished_food]
 		}
 	
 	@staticmethod
@@ -64,7 +64,7 @@ class FixedFoodSimulation(Simulation):
 	def create_from_parameters(params: dict[str, Any]) -> 'FixedFoodSimulation':
 		for key in __class__.get_parameters():
 			if key not in params:
-				raise Exception(f"Missing required parameter: {key}")
+				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
 		return FixedFoodSimulation(
 			params["brain"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-lifespan"],

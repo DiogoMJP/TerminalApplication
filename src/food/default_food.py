@@ -23,10 +23,10 @@ class DefaultFood(Food):
 
 	def to_dict(self) -> dict[str, Any]:
 		return {
-			"type": "default-food",
-			"first-time-step" : self.first_time_step,
-			"last-time-step" : self.last_time_step,
-			"eaten" : self.eaten
+			"type"				: "default-food",
+			"first-time-step"	: self.first_time_step,
+			"last-time-step"	: self.last_time_step,
+			"eaten"				: self.eaten
 		}
 	
 	@staticmethod

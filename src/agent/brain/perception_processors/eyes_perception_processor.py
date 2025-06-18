@@ -73,9 +73,9 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 
 	def to_dict(self) -> dict[str, Any]:
 		return {
-			"type" : "eyes-perception-processor",
-			"n-sensors" : self.n_sensors,
-			"fov" : self.fov
+			"type"		: "eyes-perception-processor",
+			"n-sensors"	: self.n_sensors,
+			"fov"		: self.fov
 		}
 	
 	@staticmethod

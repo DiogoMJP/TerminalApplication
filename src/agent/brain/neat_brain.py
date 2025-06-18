@@ -32,9 +32,9 @@ class NeatBrain(Brain):
 
 	def to_dict(self) -> dict[str, Any]:
 		return {
-			"type" : "neat-brain",
-			"network" : self.neat_net.to_dict(),
-			"perception-processor" : self.perception_processor.to_dict()
+			"type"					: "neat-brain",
+			"network"				: self.neat_net.to_dict(),
+			"perception-processor"	: self.perception_processor.to_dict()
 		}
 	
 	@staticmethod

@@ -52,18 +52,18 @@ class Training(CreatableFromParameters):
 	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:
 		simulation_params = get_simulation_parameters(self.simulation_type)
 		params = {
-			"brain" : brain,
-			"width" : self.width,
-			"height" : self.height,
-			"n-agents" : self.n_agents,
-			"agent-type" : self.agent_type,
-			"agents-lifespan" : self.agents_lifespan,
-			"agents-lifespan-extension" : self.agents_lifespan_extension,
-			"food-lifespan" : self.food_lifespan,
-			"perception-distance" : self.perception_distance,
-			"eating-distance" : self.eating_distance,
-			"eating-number" : self.eating_number,
-			"max-time-steps" : self.max_time_steps
+			"brain"						: brain,
+			"width"						: self.width,
+			"height"					: self.height,
+			"n-agents"					: self.n_agents,
+			"agent-type"				: self.agent_type,
+			"agents-lifespan"			: self.agents_lifespan,
+			"agents-lifespan-extension"	: self.agents_lifespan_extension,
+			"food-lifespan"				: self.food_lifespan,
+			"perception-distance"		: self.perception_distance,
+			"eating-distance"			: self.eating_distance,
+			"eating-number"				: self.eating_number,
+			"max-time-steps"			: self.max_time_steps
 		}
 		if "food-spawn-rate" in simulation_params and self.food_spawn_rate != None:
 			params["food-spawn-rate"] = self.food_spawn_rate
@@ -73,18 +73,18 @@ class Training(CreatableFromParameters):
 	
 	def to_dict(self) -> dict[str, Any]:
 		data = {
-			"n-generations" : self.n_generations,
-			"width" : self.width,
-			"height" : self.height,
-			"n-agents" : self.n_agents,
-			"agents-lifespan" : self.agents_lifespan,
-			"agents-lifespan-extension" : self.agents_lifespan_extension,
-			"food-lifespan" : self.food_lifespan,
-			"perception-distance" : self.perception_distance,
-			"eating-distance" : self.eating_distance,
-			"eating-number" : self.eating_number,
-			"max-time-steps" : self.max_time_steps,
-			"simulation-type" : self.simulation_type
+			"n-generations"				: self.n_generations,
+			"width"						: self.width,
+			"height"					: self.height,
+			"n-agents"					: self.n_agents,
+			"agents-lifespan"			: self.agents_lifespan,
+			"agents-lifespan-extension"	: self.agents_lifespan_extension,
+			"food-lifespan"				: self.food_lifespan,
+			"perception-distance"		: self.perception_distance,
+			"eating-distance"			: self.eating_distance,
+			"eating-number"				: self.eating_number,
+			"max-time-steps"			: self.max_time_steps,
+			"simulation-type"			: self.simulation_type
         }
 		if self.food_spawn_rate != None: data |= {"food-spawn-rate" : self.food_spawn_rate}
 		if self.n_food != None: data |= {"n-food" : self.n_food}

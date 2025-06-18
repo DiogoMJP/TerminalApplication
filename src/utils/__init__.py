@@ -1,1 +1,1 @@
-from src.utils.CreatableFromParameters import CreatableFromParameters
+from src.utils.creatable_from_parameters import CreatableFromParameters

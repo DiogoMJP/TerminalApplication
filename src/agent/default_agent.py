@@ -41,8 +41,8 @@ class DefaultAgent(Agent):
 
 	def to_dict(self) -> dict[str, Any]:
 		return {
-			"type": "default-agent",
-			"lifetime" : self.last_time_step
+			"type"		: "default-agent",
+			"lifetime"	: self.last_time_step
 #             "history" : [(state["x"], state["y"], state["angle"]) for state in self.history]
 		}
 
