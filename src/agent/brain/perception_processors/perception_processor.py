@@ -1,6 +1,6 @@
 from __future__	import annotations
 
-from src.utils	import CreatableFromParameters
+from src.utils	import CreatableFromParameters, Loadable
 
 import numpy as np
 from abc	import abstractmethod
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 	from src.food	import Food
 
 
-class PerceptionProcessor(CreatableFromParameters):
+class PerceptionProcessor(CreatableFromParameters, Loadable):
 	def __init__(self, n_input: int):
 		self.n_input: int = n_input
 	
@@ -46,8 +46,3 @@ class PerceptionProcessor(CreatableFromParameters):
 	@abstractmethod
 	def to_dict(self) -> Dict[str, Any]:
 		raise NotImplementedError(f"{self.__class__.__name__}: to_dict method must be implemented in subclasses")
-	
-	@staticmethod
-	@abstractmethod
-	def load_from_data(data: dict[str, Any]) -> 'PerceptionProcessor':
-		raise NotImplementedError(f"{__class__.__name__}: load_from_data method must be implemented in subclasses")

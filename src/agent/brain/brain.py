@@ -1,6 +1,6 @@
 from __future__	import annotations
 
-from src.utils	import CreatableFromParameters
+from src.utils	import CreatableFromParameters, Loadable
 
 from abc	import abstractmethod
 from typing	import Any, TYPE_CHECKING
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 	from src.food								import Food
 
 
-class Brain(CreatableFromParameters):
+class Brain(CreatableFromParameters, Loadable):
 	def __init__(self, n_output: int, perception_processor: PerceptionProcessor):
 		self.n_output				: int					= n_output
 		self.perception_processor	: PerceptionProcessor	= perception_processor
@@ -28,8 +28,3 @@ class Brain(CreatableFromParameters):
 	@abstractmethod
 	def to_dict(self) -> dict[str, Any]:
 		raise NotImplementedError(f"{self.__class__.__name__}: to_dict method must be implemented in subclasses")
-	
-	@staticmethod
-	@abstractmethod
-	def load_from_data(data: dict[str, Any]) -> 'Brain':
-		raise NotImplementedError(f"{__class__.__name__}: load_from_data method must be implemented in subclasses")
