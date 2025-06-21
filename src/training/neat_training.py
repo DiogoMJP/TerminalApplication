@@ -1,16 +1,15 @@
 from __future__	import annotations
 
-from src.agent.brain 						import create_brain
-from src.simulation 						import create_simulation
-from src.training							import Training
+from src.agent.brain	import create_brain
+from src.simulation		import create_simulation
+from src.training		import Training
 
 import neat
-from neat	import Config, DefaultGenome
 from typing	import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from src.agent.brain	import Brain
-	from src.simulation		import Simulation
+	from src.simulation	import Simulation
+	from neat			import Config, DefaultGenome
 
 
 class NeatTraining(Training):
@@ -18,14 +17,14 @@ class NeatTraining(Training):
 		self, n_generations: int, width: int, height: int, n_agents: int, agent_type: str,
 		agents_lifespan: int, agents_lifespan_extension: int, food_lifespan: int,
 		perception_distance: int, eating_distance: int, eating_number: int, max_time_steps: int,
-		config_file: str, perception_processor_type: str, simulation_type: str
+		perception_processor_type: str, simulation_type: str, config_file: str
 	):
 		super().__init__(
 			n_generations, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
 			food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps, 
-		perception_processor_type, simulation_type
+			perception_processor_type, simulation_type
 		)
-		self.config_file				: str	= config_file
+		self.config_file	: str	= config_file
 
 		self.config_params				: dict[str, Any]											= {}
 		self.simulations 				: dict[str, dict[str, tuple[Simulation, DefaultGenome]]]	= {}
@@ -50,7 +49,7 @@ class NeatTraining(Training):
 
 	def start_training(self) -> None:
 		# Load configuration.
-		config = Config(
+		config = neat.Config(
 			neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, 
 			neat.DefaultStagnation, self.config_file
 		)
@@ -98,7 +97,6 @@ class NeatTraining(Training):
 		return {
 			"type"				: "neat-training",
 			"config-file"		: self.config_file,
-			"food-spawn-rate"	: self.food_spawn_rate,
 			"simulations"		: {
 				gen_id : {
 					sim_id : sim[0].to_dict() for sim_id, sim in gen.items()
@@ -112,7 +110,7 @@ class NeatTraining(Training):
 		return (
 			"n-generations", "width", "height", "n-agents", "agent-type", "agents-lifespan",
 			"agents-lifespan-extension", "food-lifespan", "perception-distance", "eating-distance",
-			"eating-number", "max-time-steps", "config-file", "perception-processor-type", "simulation-type"
+			"eating-number", "max-time-steps", "perception-processor-type", "simulation-type", "config-file"
 		)
 	
 	@staticmethod
@@ -124,7 +122,7 @@ class NeatTraining(Training):
 			params["n-generations"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-lifespan"],
 			params["perception-distance"], params["eating-distance"], params["eating-number"], params["max-time-steps"],
-			params["config-file"], params["perception-processor-type"], params["simulation-type"]
+			params["perception-processor-type"], params["simulation-type"], params["config-file"]
 		)
 		if "food-spawn-rate" in params: training.food_spawn_rate = params["food-spawn-rate"]
 		if "n-food" in params: training.n_food = params["n-food"]

@@ -1,5 +1,6 @@
-from src.simulation		import create_simulation
-from src.training		import create_training, Training
+from src.simulation			import create_simulation
+from src.training			import create_training
+from src.training.replay	import load_training_replay_from_data
 
 import matplotlib
 matplotlib.use('Agg')
@@ -8,7 +9,10 @@ import matplotlib.pyplot as plt
 import textwrap
 from pathlib import Path
 from time import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+	from src.training	import Training
 
 
 DEFAULT_PARAMS = {
@@ -260,6 +264,8 @@ class TerminalApplication(object):
 	def create_graph_from_training_data(self, simulation_type: str, config_file: str, eating_number: int) -> None:
 		print()
 		print(f"Generating graphs for training {simulation_type} with config {config_file} and eating number {eating_number}")
+		with open(f"saved_data/{simulation_type}/{config_file}/{eating_number}.json", "r") as fp:
+			training_replay = load_training_replay_from_data(json.load(fp)	)
 		self.create_fitness_plot(simulation_type, config_file, eating_number)
 		self.create_node_plot(simulation_type, config_file, eating_number)
 		self.create_duration_plot(simulation_type, config_file, eating_number)

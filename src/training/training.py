@@ -77,6 +77,7 @@ class Training(CreatableFromParameters):
 			"width"						: self.width,
 			"height"					: self.height,
 			"n-agents"					: self.n_agents,
+			"agent-type"				: self.agent_type,
 			"agents-lifespan"			: self.agents_lifespan,
 			"agents-lifespan-extension"	: self.agents_lifespan_extension,
 			"food-lifespan"				: self.food_lifespan,
@@ -84,6 +85,7 @@ class Training(CreatableFromParameters):
 			"eating-distance"			: self.eating_distance,
 			"eating-number"				: self.eating_number,
 			"max-time-steps"			: self.max_time_steps,
+			"perception-processor-type"	: self.perception_processor_type,
 			"simulation-type"			: self.simulation_type
         }
 		if self.food_spawn_rate != None: data |= {"food-spawn-rate" : self.food_spawn_rate}
