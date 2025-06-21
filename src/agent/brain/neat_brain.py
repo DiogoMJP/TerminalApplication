@@ -17,6 +17,9 @@ class NeatBrain(Brain):
 		super().__init__(3, perception_processor)
 		self.neat_net	: NeatNeuralNetwork	= neat_net
 	
+	def get_n_nodes(self) -> int:
+		return len(self.neat_net.node_evals) + len(self.neat_net.inputs)
+	
 	def get_action(
 		self, state: dict[str, Any], perception_distance: int, food_list: list[Food], agent_list: list[Agent]
 	) -> tuple[int, int, int]:

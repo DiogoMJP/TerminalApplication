@@ -20,6 +20,10 @@ class Brain(CreatableFromParameters, Loadable):
 		return self.perception_processor.get_closest_food(state, food_list)
 
 	@abstractmethod
+	def get_n_nodes(self) -> int:
+		raise NotImplementedError(f"{self.__class__.__name__}: get_n_nodes method must be implemented in subclasses")
+
+	@abstractmethod
 	def get_action(
 		self, state: dict[str, Any], perception_distance: int, food_list: list[Food], agent_list: list[Agent]
 	) -> tuple[int, ...]:

@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from src.utils	import Loadable
 
-from typing	import Any, Optional, TYPE_CHECKING
+from abc	import abstractmethod
+from typing	import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.agent.brain	import Brain
@@ -33,3 +34,7 @@ class TrainingReplay(Loadable):
 		self.brain						: Optional[Brain]	= None
 		self.n_sensors					: Optional[int]		= None
 		self.fov						: Optional[int]		= None
+	
+	@abstractmethod
+	def create_graphs(self, path: str) -> None:
+		raise NotImplementedError(f"{self.__class__.__name__}: create_graphs method must be implemented in subclasses")

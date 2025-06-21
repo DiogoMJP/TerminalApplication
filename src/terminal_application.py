@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from src.simulation			import create_simulation
 from src.training			import create_training
 from src.training.replay	import load_training_replay_from_data
@@ -167,107 +169,10 @@ class TerminalApplication(object):
 		fig.suptitle("Average agent performance")
 		fig.savefig(f"saved_data/{simulation_type}/average_performance.png")
 		plt.close('all')
-	
-	def create_fitness_plot(self, simulation_type: str, config_file: str, eating_number: int) -> None:
-		file_name = f"saved_data/{simulation_type}/{config_file}/{eating_number}.json"
-		with open(file_name, "r") as fp:
-			data = json.load(fp)
-		fitness_data = [
-			sum([
-				sum([1 for food in sim["food"] if food["eaten"]])
-				for sim in gen.values()
-			]) / len(gen.values())
-			for _, gen in data["simulations"].items()
-		]
-		_, ax = plt.subplots()
-		ax.plot([i for i in range(len(fitness_data))], fitness_data)
-		plt.xlabel("Generation")
-		plt.ylabel("Average Fitness")
-		plt.title("Average Fitness Over Generations")
-		plt.savefig(file_name.replace(".json", "_fitness.png"))
-
-	def create_node_plot(self, simulation_type: str, config_file: str, eating_number: int) -> None:
-		file_name = f"saved_data/{simulation_type}/{config_file}/{eating_number}.json"
-		with open(file_name, "r") as fp:
-			data = json.load(fp)
-		node_data = [
-			sum([
-				len(sim["brain"]["network"]["node-evals"]) +
-				len(sim["brain"]["network"]["inputs"])
-				for sim in gen.values()
-			]) / len(gen.values())
-			for _, gen in data["simulations"].items()
-		]
-		_, ax = plt.subplots()
-		ax.plot([i for i in range(len(node_data))], node_data)
-		plt.xlabel("Generation")
-		plt.ylabel("Average Number of Nodes")
-		plt.title("Average Number of Nodes Over Generations")
-		plt.savefig(file_name.replace(".json", "_nodes.png"))
-
-	def create_duration_plot(self, simulation_type: str, config_file: str, eating_number: int) -> None:
-		# simulation_data = []
-		# for _, gen in data["simulations"].items():
-		# 	sim = [
-		# 		sim["duration"]
-		# 		for sim in gen.values()
-		# 	]
-		# 	sim.sort(reverse=True)
-		# 	simulation_data += [sim[:10]]
-		# duration_data = [sum(sim) / len(sim) for sim in simulation_data]
-		file_name = f"saved_data/{simulation_type}/{config_file}/{eating_number}.json"
-		with open(file_name, "r") as fp:
-			data = json.load(fp)
-		duration_data = [
-			sum([
-				sim["duration"] for sim in gen.values()
-			]) / len(gen.values())
-			for _, gen in data["simulations"].items()
-		]
-		_, ax = plt.subplots()
-		ax.plot([i for i in range(len(duration_data))], duration_data)
-		plt.xlabel("Generation")
-		plt.ylabel("Average Duration (time steps)")
-		plt.title("Average Duration of Simulations Over Generations")
-		plt.savefig(file_name.replace(".json", "_duration.png"))
-	
-	def create_food_plot(self, simulation_type: str, config_file: str, eating_number: int) -> None:
-		file_name = f"saved_data/{simulation_type}/{config_file}/{eating_number}.json"
-		with open(file_name, "r") as fp:
-			data = json.load(fp)
-		time_step_data = [sum([
-			sum([
-				len([
-					1 for food in sim["food"]
-					if food["first-time-step"] <= i and food["last-time-step"] > i
-				])
-				for sim in gen.values()
-			]) for _, gen in data["simulations"].items()]) / sum([
-					len([1 for sim in gen.values()
-						if sim["duration"] > i
-					])
-				for _, gen in data["simulations"].items()
-			])
-			for i in range(max([
-					max([sim["duration"] for sim in gen.values()])
-				for _, gen in data["simulations"].items()
-			]))
-		]
-		_, ax = plt.subplots()
-		ax.plot([i for i in range(len(time_step_data))], time_step_data)
-		plt.xlabel("Time Step")
-		plt.ylabel("Average Amount of Food")
-		plt.title("Average Amount of Food Over Each Time Step")
-		plt.savefig(file_name.replace(".json", "_food.png"))
-		plt.close('all')
 
 	def create_graph_from_training_data(self, simulation_type: str, config_file: str, eating_number: int) -> None:
 		print()
 		print(f"Generating graphs for training {simulation_type} with config {config_file} and eating number {eating_number}")
 		with open(f"saved_data/{simulation_type}/{config_file}/{eating_number}.json", "r") as fp:
 			training_replay = load_training_replay_from_data(json.load(fp)	)
-		self.create_fitness_plot(simulation_type, config_file, eating_number)
-		self.create_node_plot(simulation_type, config_file, eating_number)
-		self.create_duration_plot(simulation_type, config_file, eating_number)
-		self.create_food_plot(simulation_type, config_file, eating_number)
-		plt.close('all')
+		training_replay.create_graphs(f"saved_data/{simulation_type}/{config_file}/{eating_number}")
