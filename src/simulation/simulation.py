@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class Simulation(CreatableFromParameters):
 	def __init__(
 		self, brain : Brain, width: int, height: int, n_agents: int, agent_type: str, agents_lifespan: int,
-		agents_lifespan_extension: int, food_lifespan: int, perception_distance: int, eating_distance: int,
+		agents_lifespan_extension: int, food_type: str, food_lifespan: int, perception_distance: int, eating_distance: int,
 		eating_number: int, max_time_steps: int
 	):
 		self.brain						: Brain	= brain
@@ -27,7 +27,8 @@ class Simulation(CreatableFromParameters):
 		self.n_agents					: int	= n_agents
 		self.agent_type					: str	= agent_type
 		self.agents_lifespan			: int	= agents_lifespan
-		self.agents_lifespan_extension	: int	= agents_lifespan_extension		
+		self.agents_lifespan_extension	: int	= agents_lifespan_extension
+		self.food_type					: str	= food_type
 		self.food_lifespan				: int	= food_lifespan
 		self.perception_distance		: int	= perception_distance
 		self.eating_distance			: int	= eating_distance
@@ -47,7 +48,7 @@ class Simulation(CreatableFromParameters):
 	def get_n_food(self) -> int:
 		return len([1 for food in self.food if food.alive])
 	def get_n_eaten_food(self) -> int:
-		return len([1 for food in self.food if food.eaten])
+		return len([1 for food in self.finished_food if food.eaten])
 
 	def create_agents(self) -> None:
 		for _ in range(self.n_agents):
@@ -60,7 +61,7 @@ class Simulation(CreatableFromParameters):
 			self.agents += [agent]
 	def create_food(self) -> None:
 		params = self.generate_food_parameters()
-		self.food += [create_food("default-food", params)]
+		self.food += [create_food(self.food_type, params)]
 	def separate_food(self) -> None:
 		dead_food = [food for food in self.food if not food.alive]
 		self.finished_food += dead_food

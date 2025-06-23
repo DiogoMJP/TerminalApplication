@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class Training(CreatableFromParameters):
 	def __init__(
 		self, n_generations: int, width: int, height: int, n_agents: int, agent_type: str, agents_lifespan: int,
-		agents_lifespan_extension: int, food_lifespan: int, perception_distance: int, eating_distance: int,
+		agents_lifespan_extension: int, food_type: str, food_lifespan: int, perception_distance: int, eating_distance: int,
 		eating_number: int, max_time_steps: int, perception_processor_type: str, simulation_type: str
 	):
 		self.n_generations				: int				= n_generations
@@ -24,6 +24,7 @@ class Training(CreatableFromParameters):
 		self.agent_type					: str				= agent_type
 		self.agents_lifespan			: int				= agents_lifespan
 		self.agents_lifespan_extension	: int				= agents_lifespan_extension
+		self.food_type					: str				= food_type
 		self.food_lifespan				: int				= food_lifespan
 		self.perception_distance		: int				= perception_distance
 		self.eating_distance			: int				= eating_distance
@@ -59,6 +60,7 @@ class Training(CreatableFromParameters):
 			"agent-type"				: self.agent_type,
 			"agents-lifespan"			: self.agents_lifespan,
 			"agents-lifespan-extension"	: self.agents_lifespan_extension,
+			"food-type"					: self.food_type,
 			"food-lifespan"				: self.food_lifespan,
 			"perception-distance"		: self.perception_distance,
 			"eating-distance"			: self.eating_distance,
@@ -80,6 +82,7 @@ class Training(CreatableFromParameters):
 			"agent-type"				: self.agent_type,
 			"agents-lifespan"			: self.agents_lifespan,
 			"agents-lifespan-extension"	: self.agents_lifespan_extension,
+			"food-type"					: self.food_type,
 			"food-lifespan"				: self.food_lifespan,
 			"perception-distance"		: self.perception_distance,
 			"eating-distance"			: self.eating_distance,

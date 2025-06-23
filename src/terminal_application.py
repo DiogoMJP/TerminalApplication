@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from src.agent.brain		import create_brain
 from src.simulation			import create_simulation
 from src.training			import create_training
 from src.training.replay	import load_training_replay_from_data
@@ -9,9 +10,10 @@ matplotlib.use('Agg')
 import json
 import matplotlib.pyplot as plt
 import textwrap
-from pathlib import Path
-from time import time
-from typing import Any, Dict, List, TYPE_CHECKING
+from math		import cos, radians, sin
+from pathlib	import Path
+from time		import time
+from typing		import Any, Dict, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.training	import Training
@@ -25,6 +27,7 @@ DEFAULT_PARAMS = {
 	"agent-type"				: "default-agent",
 	"agents-lifespan"			: 350,
 	"agents-lifespan-extension"	: 350,
+	"food-type"					: "default-food",
 	"food-lifespan"				: 350,
 	"perception-distance"		: 200,
 	"eating-distance"			: 15,
@@ -103,6 +106,7 @@ class TerminalApplication(object):
 			self.generate_average_performance_graph(simulation_type)
 		print()
 		print("Training completed.")
+		# self.watch_simulation("random-food-simulation", "01_starting_config", 1)
 	
 	def train(self, simulation_type: str, config_file: str, eating_number: int) -> None:
 		print()

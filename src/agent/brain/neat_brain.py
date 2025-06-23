@@ -8,13 +8,16 @@ from src.agent.brain.perception_processors	import PerceptionProcessor, \
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from src.agent	import Agent
-	from src.food	import Food
+	from src.agent						import Agent
+	from src.agent.brain.neural_network	import NeuralNetwork
+	from src.food						import Food
 
 
 class NeatBrain(Brain):
-	def __init__(self, neat_net: NeatNeuralNetwork, perception_processor: PerceptionProcessor):
+	def __init__(self, neat_net: NeuralNetwork, perception_processor: PerceptionProcessor):
 		super().__init__(3, perception_processor)
+		if type(neat_net) != NeatNeuralNetwork:
+			raise Exception(f"{self.__class__.__name__}: Wrong neural network type: {type(neat_net)}")
 		self.neat_net	: NeatNeuralNetwork	= neat_net
 	
 	def get_n_nodes(self) -> int:
@@ -23,7 +26,7 @@ class NeatBrain(Brain):
 	def get_action(
 		self, state: dict[str, Any], perception_distance: int, food_list: list[Food], agent_list: list[Agent]
 	) -> tuple[int, int, int]:
-		input = self.perception_processor.process_input(state, perception_distance, food_list, agent_list)
+		input = self.get_perception(state, perception_distance, food_list, agent_list)
 		
 		output = self.neat_net.activate(input)
 		l_rot = 1 if output[0] >= 0.5 else 0

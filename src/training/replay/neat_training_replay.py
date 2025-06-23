@@ -34,24 +34,7 @@ class NeatTrainingReplay(TrainingReplay):
 				for sim_id, sim_data in gen.items()
 			} for gen_id, gen in simulations.items()
 		}
-
-	@staticmethod
-	def load_from_data(data: dict[str, Any]) -> 'NeatTrainingReplay':
-		training_replay = NeatTrainingReplay(
-			data["n-generations"], data["width"], data["height"], data["n-agents"], data["agent-type"],
-			data["agents-lifespan"], data["agents-lifespan-extension"], data["food-lifespan"],
-			data["perception-distance"], data["eating-distance"], data["eating-number"], data["max-time-steps"],
-			data["perception-processor-type"], data["simulation-type"], data["config-file"], data["config-params"],
-			data["simulations"]
-		)
-		if "food-spawn-rate" in data: training_replay.food_spawn_rate = data["food-spawn-rate"]
-		if "n-food" in data: training_replay.n_food = data["n-food"]
-		if "brain" in data: training_replay.brain = load_brain_from_data(data["brain"])
-		if "n-sensors" in data: training_replay.n_sensors = data["n-sensors"]
-		if "fov" in data: training_replay.fov = data["fov"]
-
-		return training_replay
-
+	
 	def create_fitness_plot(self, path: str) -> None:
 		fitness_data = [
 			sum([
@@ -134,3 +117,20 @@ class NeatTrainingReplay(TrainingReplay):
 		self.create_duration_plot(path)
 		self.create_food_plot(path)
 		plt.close('all')
+
+	@staticmethod
+	def load_from_data(data: dict[str, Any]) -> 'NeatTrainingReplay':
+		training_replay = NeatTrainingReplay(
+			data["n-generations"], data["width"], data["height"], data["n-agents"], data["agent-type"],
+			data["agents-lifespan"], data["agents-lifespan-extension"], data["food-lifespan"],
+			data["perception-distance"], data["eating-distance"], data["eating-number"], data["max-time-steps"],
+			data["perception-processor-type"], data["simulation-type"], data["config-file"], data["config-params"],
+			data["simulations"]
+		)
+		if "food-spawn-rate" in data: training_replay.food_spawn_rate = data["food-spawn-rate"]
+		if "n-food" in data: training_replay.n_food = data["n-food"]
+		if "brain" in data: training_replay.brain = load_brain_from_data(data["brain"])
+		if "n-sensors" in data: training_replay.n_sensors = data["n-sensors"]
+		if "fov" in data: training_replay.fov = data["fov"]
+
+		return training_replay

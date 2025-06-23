@@ -15,13 +15,13 @@ if TYPE_CHECKING:
 class NeatTraining(Training):
 	def __init__(
 		self, n_generations: int, width: int, height: int, n_agents: int, agent_type: str,
-		agents_lifespan: int, agents_lifespan_extension: int, food_lifespan: int,
+		agents_lifespan: int, agents_lifespan_extension: int, food_type: str, food_lifespan: int,
 		perception_distance: int, eating_distance: int, eating_number: int, max_time_steps: int,
 		perception_processor_type: str, simulation_type: str, config_file: str
 	):
 		super().__init__(
 			n_generations, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
-			food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps, 
+			food_type, food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps, 
 			perception_processor_type, simulation_type
 		)
 		self.config_file	: str	= config_file
@@ -109,7 +109,7 @@ class NeatTraining(Training):
 	def get_parameters() -> tuple[str, ...]:
 		return (
 			"n-generations", "width", "height", "n-agents", "agent-type", "agents-lifespan",
-			"agents-lifespan-extension", "food-lifespan", "perception-distance", "eating-distance",
+			"agents-lifespan-extension", "food-type", "food-lifespan", "perception-distance", "eating-distance",
 			"eating-number", "max-time-steps", "perception-processor-type", "simulation-type", "config-file"
 		)
 	
@@ -120,7 +120,7 @@ class NeatTraining(Training):
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
 		training = NeatTraining(
 			params["n-generations"], params["width"], params["height"], params["n-agents"], params["agent-type"],
-			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-lifespan"],
+			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-type"], params["food-lifespan"],
 			params["perception-distance"], params["eating-distance"], params["eating-number"], params["max-time-steps"],
 			params["perception-processor-type"], params["simulation-type"], params["config-file"]
 		)

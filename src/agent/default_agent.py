@@ -21,10 +21,9 @@ class DefaultAgent(Agent):
 
 	def simulate(self, time_step: int, food_list: list[Food], agent_list: list[Agent]) -> None:
 		if self.alive:
-			if (time_step >= self.lifespan):
+			if (time_step == self.lifespan):
 				self.alive = False
 				self.last_time_step = time_step
-			
 			else:
 				l_rot, r_rot, speed = self.brain.get_action(self.state, self.perception_distance, food_list, agent_list)
 				change = -3 if l_rot else 3 if r_rot else 0

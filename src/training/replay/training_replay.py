@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from src.utils	import Loadable
+from src.simulation	import get_simulation_parameters
+from src.utils		import Loadable
 
 from abc	import abstractmethod
-from typing	import Optional, TYPE_CHECKING
+from typing	import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.agent.brain	import Brain
@@ -34,6 +35,28 @@ class TrainingReplay(Loadable):
 		self.brain						: Optional[Brain]	= None
 		self.n_sensors					: Optional[int]		= None
 		self.fov						: Optional[int]		= None
+	
+	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:
+		simulation_params = get_simulation_parameters(self.simulation_type)
+		params = {
+			"brain"						: brain,
+			"width"						: self.width,
+			"height"					: self.height,
+			"n-agents"					: self.n_agents,
+			"agent-type"				: self.agent_type,
+			"agents-lifespan"			: self.agents_lifespan,
+			"agents-lifespan-extension"	: self.agents_lifespan_extension,
+			"food-lifespan"				: self.food_lifespan,
+			"perception-distance"		: self.perception_distance,
+			"eating-distance"			: self.eating_distance,
+			"eating-number"				: self.eating_number,
+			"max-time-steps"			: self.max_time_steps
+		}
+		if "food-spawn-rate" in simulation_params and self.food_spawn_rate != None:
+			params["food-spawn-rate"] = self.food_spawn_rate
+		if "n-food" in simulation_params and self.n_food != None:
+			params["n-food"] = self.n_food
+		return params
 	
 	@abstractmethod
 	def create_graphs(self, path: str) -> None:
