@@ -10,10 +10,9 @@ matplotlib.use('Agg')
 import json
 import matplotlib.pyplot as plt
 import textwrap
-from math		import cos, radians, sin
 from pathlib	import Path
 from time		import time
-from typing		import Any, Dict, List, TYPE_CHECKING
+from typing		import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.training	import Training
@@ -86,12 +85,12 @@ def wrap_labels(ax, labels, width, break_long_words=False):
 class TerminalApplication(object):
 	def __init__(self):
 		# remove_directory_tree(Path("saved_data"))
-		self.params				: Dict[str, Any]					= dict(DEFAULT_PARAMS)
-		self.simulation_types	: List[str]							= list(SIMULATION_TYPES)
+		self.params				: dict[str, Any]					= dict(DEFAULT_PARAMS)
+		self.simulation_types	: list[str]							= list(SIMULATION_TYPES)
 		self.config_files		: list[tuple[str, dict[str, Any]]]	= [
 			(config[0], dict(config[1])) for config in CONFIGS
 		]
-		self.eating_numbers		: List[int]							= list(EATING_NUMBERS)
+		self.eating_numbers		: list[int]							= list(EATING_NUMBERS)
 
 	def main(self) -> None:
 		for simulation_type in self.simulation_types:
