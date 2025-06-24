@@ -22,7 +22,6 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 		agent_list: list[Agent], width: int, height: int
 	) -> tuple[int | float, ...]:
 		x, y = state["x"], state["y"]
-		pos = [x, y]
 		
 		angle = state["angle"]
 		cones = [
@@ -32,9 +31,9 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 			)
 		]
 
-		output = [[-1.0, 0.0] for _ in range(self.n_sensors)]
+		output = [[0.0, 0.0, 0.0, 1.0] for _ in range(self.n_sensors)]
 
-		def process_entity(e_x: float, e_y: float, entity_type: float) -> None:
+		def process_entity(e_x: float, e_y: float, entity_key: int) -> None:
 			dx = e_x - x
 			dy = e_y - y
 			dist_sq = dx * dx + dy * dy
@@ -56,24 +55,25 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 					best_i = i
 			if degrees(acos(max(min(best_dot, 1), 0))) < self.view_cone / 2:
 				rel_dist = dist / perception_distance
-				if output[best_i][1] > rel_dist or output[best_i][0] == -1:
-					output[best_i] = [entity_type, rel_dist]
+				if output[best_i][-1] > rel_dist:
+					output[best_i] = [0.0, 0.0, 0.0, rel_dist]
+					output[best_i][entity_key] = 1.0
 
 		for food in food_list:
 			if food.alive:
-				process_entity(food.x, food.y, 1.0)
+				process_entity(food.x, food.y, 1)
 
 		for agent in agent_list:
 			if agent.alive:
-				process_entity(agent.get_from_state("x"), agent.get_from_state("y"), 2.0)
+				process_entity(agent.get_from_state("x"), agent.get_from_state("y"), 2)
 		
 		for i in range(self.n_sensors):
-			if output[i][0] == -1:
+			if output[i][1] == 0.0 and output[i][2] == 0.0:
 				if x + perception_distance * cones[i][0] < 0 or x + perception_distance * cones[i][0] >= width or \
-				   y + perception_distance * cones[i][1] < 0 or y + perception_distance * cones[i][1] >= height:
-					output[i] = [0.0, 1.0]
-
-		return tuple(val for pair in output for val in pair)
+					y + perception_distance * cones[i][1] < 0 or y + perception_distance * cones[i][1] >= height:
+					output[i] = [1.0, 0.0, 0.0, 0.0]
+		
+		return tuple(val for set in output for val in set)
 
 	def to_dict(self) -> dict[str, Any]:
 		return {
