@@ -58,17 +58,20 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 				if output[best_i][1] > rel_dist or output[best_i][0] == -1:
 					output[best_i] = [entity_type, rel_dist]
 
-		# Process food
 		for food in food_list:
 			if food.alive:
 				process_entity(food.x, food.y, 1.0)
 
-		# Process agents
 		for agent in agent_list:
 			if agent.alive:
 				process_entity(agent.get_from_state("x"), agent.get_from_state("y"), 2.0)
+		
+		for i in range(self.n_sensors):
+			if output[i][0] == -1:
+				if x + perception_distance * cones[i][0] < 0 or x + perception_distance * cones[i][0] >= screen.get_width() or \
+				   y + perception_distance * cones[i][1] < 0 or y + perception_distance * cones[i][1] >= screen.get_height():
+					output[i] = [0.0, 1.0]
 
-		# Flatten and return as tuple
 		return tuple(val for pair in output for val in pair)
 
 	def to_dict(self) -> dict[str, Any]:
