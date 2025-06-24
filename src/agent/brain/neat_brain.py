@@ -24,9 +24,12 @@ class NeatBrain(Brain):
 		return len(self.neat_net.node_evals) + len(self.neat_net.inputs)
 	
 	def get_action(
-		self, state: dict[str, Any], perception_distance: int, food_list: list[Food], agent_list: list[Agent]
+		self, state: dict[str, Any], perception_distance: int, food_list: list[Food],
+		agent_list: list[Agent], width: int, height: int
 	) -> tuple[int, int, int]:
-		input = self.get_perception(state, perception_distance, food_list, agent_list)
+		input = self.get_perception(
+			state, perception_distance, food_list, agent_list, width, height
+		)
 		
 		output = self.neat_net.activate(input)
 		l_rot = 1 if output[0] >= 0.5 else 0

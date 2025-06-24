@@ -15,7 +15,8 @@ class NormalisedInputPerceptionProcessor(PerceptionProcessor):
 		super().__init__(6)
 
 	def process_input(
-		self, state: dict[str, Any], perception_distance: int, food_list: list[Food], agent_list: list[Agent]
+		self, state: dict[str, Any], perception_distance: int, food_list: list[Food],
+		agent_list: list[Agent], width: int, height: int
 	) -> tuple[float, float, float, float, float, float]:
 		x = state["x"]; y = state["y"]; angle = state["angle"]
 		output = [-1.0, 1.0, 1.0, -1.0, 1.0, 1.0]

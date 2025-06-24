@@ -18,7 +18,8 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 		self.view_cone	: float	= fov / n_sensors
 	
 	def process_input(
-    	self, state: dict[str, Any], perception_distance: int, food_list: list[Food], agent_list: list[Agent]
+    	self, state: dict[str, Any], perception_distance: int, food_list: list[Food],
+		agent_list: list[Agent], width: int, height: int
 	) -> tuple[int | float, ...]:
 		x, y = state["x"], state["y"]
 		pos = [x, y]
@@ -68,8 +69,8 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 		
 		for i in range(self.n_sensors):
 			if output[i][0] == -1:
-				if x + perception_distance * cones[i][0] < 0 or x + perception_distance * cones[i][0] >= screen.get_width() or \
-				   y + perception_distance * cones[i][1] < 0 or y + perception_distance * cones[i][1] >= screen.get_height():
+				if x + perception_distance * cones[i][0] < 0 or x + perception_distance * cones[i][0] >= width or \
+				   y + perception_distance * cones[i][1] < 0 or y + perception_distance * cones[i][1] >= height:
 					output[i] = [0.0, 1.0]
 
 		return tuple(val for pair in output for val in pair)

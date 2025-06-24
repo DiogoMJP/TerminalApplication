@@ -25,7 +25,10 @@ class DefaultAgent(Agent):
 				self.alive = False
 				self.last_time_step = time_step
 			else:
-				l_rot, r_rot, speed = self.brain.get_action(self.state, self.perception_distance, food_list, agent_list)
+				l_rot, r_rot, speed = self.brain.get_action(
+					self.state, self.perception_distance, food_list,
+					agent_list, self.width, self.height
+				)
 				change = -3 if l_rot else 3 if r_rot else 0
 				self.set_in_state("angle", self.get_from_state("angle") + change)
 				self.set_in_state("angle", (self.get_from_state("angle") + 180) % 360 - 180)

@@ -39,7 +39,8 @@ class PerceptionProcessor(CreatableFromParameters, Loadable):
 
 	@abstractmethod
 	def process_input(
-		self, state: Dict[str, Any], perception_distance: int, food_list: List[Food], agent_list: List[Agent]
+		self, state: Dict[str, Any], perception_distance: int, food_list: List[Food],
+		agent_list: List[Agent], width: int, height: int
 	) -> Tuple[float, ...]:
 		raise NotImplementedError(f"{self.__class__.__name__}: process_input method must be implemented in subclasses")
 	
