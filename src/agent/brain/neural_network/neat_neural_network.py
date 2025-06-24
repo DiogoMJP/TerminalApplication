@@ -12,7 +12,6 @@ class NeatNeuralNetwork(NeuralNetwork):
 		self.node_evals = node_evals
 		self.values = dict((key, 0.0) for key in inputs + outputs)
 
-
 	def sum(self, lst: list[float]) -> float:
 		return sum(lst)
 
@@ -34,7 +33,6 @@ class NeatNeuralNetwork(NeuralNetwork):
 			self.values[node] = self.sigmoid(bias + response * s)
 
 		return [self.values[i] for i in self.outputs]
-
 	
 	def to_dict(self) -> dict[str, Any]:
 		return {

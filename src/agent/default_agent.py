@@ -36,7 +36,6 @@ class DefaultAgent(Agent):
 				if food != None and dist < self.eating_distance:
 					food.eaten_by += [self]
 			self.save_state()
-	
 
 	def to_dict(self) -> dict[str, Any]:
 		return {

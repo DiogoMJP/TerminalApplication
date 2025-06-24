@@ -50,6 +50,7 @@ class Training(CreatableFromParameters):
 		if "fov" in perception_processor_params and self.fov != None:
 			params["fov"] = self.fov
 		return params
+	
 	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:
 		simulation_params = get_simulation_parameters(self.simulation_type)
 		params = {

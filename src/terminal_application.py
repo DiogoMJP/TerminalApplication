@@ -35,8 +35,8 @@ DEFAULT_PARAMS = {
 	"config-file"				: None,
 	"perception-processor-type"	: None,
 	"simulation-type"			: None,
-	"food-spawn-rate"			: 0.03,
-	"n-food"					: 4,
+	"food-spawn-rate"			: 0.02,
+	"n-food"					: 6,
 	"n-sensors"					: 5,
 	"fov"						: 160
 }
@@ -167,7 +167,7 @@ class TerminalApplication(object):
 		fig, ax = plt.subplots(layout="constrained")
 		for i in agents:
 			ax.plot(vals.keys(), [vals[key][i] for key in vals.keys()], label=f"{i}")
-		wrap_labels(ax, list(vals.keys()), 20)
+		wrap_labels(ax, list(vals.keys()), 15)
 		ax.legend()
 		fig.suptitle("Average agent performance")
 		fig.savefig(f"saved_data/{simulation_type}/average_performance.png")

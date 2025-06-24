@@ -12,7 +12,7 @@ class DefaultFood(Food):
 
 	def simulate(self, time_step: int) -> None:
 		if self.alive:
-			if time_step - self.first_time_step >= self.lifespan or len(self.eaten_by) >= self.eating_number:
+			if time_step - self.first_time_step == self.lifespan or len(self.eaten_by) >= self.eating_number:
 				if len(self.eaten_by) >= self.eating_number:
 					self.eaten = True
 					for agent in self.eaten_by:

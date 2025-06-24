@@ -34,7 +34,6 @@ class NeatBrain(Brain):
 		speed = 1 if output[2] >= 0.5 else 0
 		
 		return (l_rot, r_rot, speed)
-	
 
 	def to_dict(self) -> dict[str, Any]:
 		return {

@@ -42,7 +42,6 @@ class StoppedByWallsAgent(Agent):
 					food.eaten_by += [self]
 			self.save_state()
 	
-
 	def to_dict(self) -> dict[str, Any]:
 		return {
 			"type"		: "stopped-by-walls-agent",

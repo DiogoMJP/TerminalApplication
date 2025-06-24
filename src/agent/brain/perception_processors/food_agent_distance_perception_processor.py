@@ -14,7 +14,6 @@ class FoodAgentDistancePerceptionProcessor(PerceptionProcessor):
 	def __init__(self):
 		super().__init__(4)
 	
-
 	def process_input(
 		self, state: dict[str, Any], perception_distance: int, food_list: list[Food], agent_list: list[Agent]
 	) -> tuple[float, float, float, float]:
