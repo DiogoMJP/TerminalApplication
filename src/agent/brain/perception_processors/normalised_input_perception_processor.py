@@ -46,7 +46,7 @@ class NormalisedInputPerceptionProcessor(PerceptionProcessor):
 		return {"type"	: "normalised-input-perception-processor"}
 	
 	@staticmethod
-	def get_parameters() -> tuple[str, ...]:
+	def get_parameters() -> tuple[tuple[str, type], ...]:
 		return tuple()
 	
 	@staticmethod

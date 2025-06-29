@@ -48,14 +48,18 @@ class NeatNeuralNetwork(NeuralNetwork):
 		return NeatNeuralNetwork(nn.input_nodes, nn.output_nodes, node_evals)
 	
 	@staticmethod
-	def get_parameters() -> tuple[str, ...]:
-		return ("neat-neural-network",)
+	def get_parameters() -> tuple[tuple[str, type], ...]:
+		return (("neat-neural-network", FeedForwardNetwork),)
 	
 	@staticmethod
 	def create_from_parameters(params: dict[str, Any]) -> 'NeatNeuralNetwork':
-		for key in __class__.get_parameters():
+		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
+			if type(params[key]) != param_type:
+				raise Exception(
+					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
+				)
 		return NeatNeuralNetwork.create_from_neat_nn(params["neat-neural-network"])
 	
 	@staticmethod

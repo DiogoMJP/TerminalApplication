@@ -57,18 +57,23 @@ class RandomFoodSimulation(Simulation):
 		}
 	
 	@staticmethod
-	def get_parameters() -> tuple[str, ...]:
+	def get_parameters() -> tuple[tuple[str, type], ...]:
 		return (
-			"brain", "width", "height", "n-agents", "agent-type", "agents-lifespan", "agents-lifespan-extension",
-			"food-type", "food-lifespan", "perception-distance", "eating-distance", "eating-number", "max-time-steps",
-			"food-spawn-rate"
+			("brain", Brain), ("width", int), ("height", int), ("n-agents", int), ("agent-type", int),
+			("agents-lifespan", int), ("agents-lifespan-extension", int), ("food-type", str), ("food-lifespan", int),
+			("perception-distance", int), ("eating-distance", int), ("eating-number", int), ("max-time-steps", int),
+			("food-spawn-rate", float)
 		)
 	
 	@staticmethod
 	def create_from_parameters(params: dict[str, Any]) -> 'RandomFoodSimulation':
-		for key in __class__.get_parameters():
+		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
+			if type(params[key]) != param_type:
+				raise Exception(
+					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
+				)
 		return RandomFoodSimulation(
 			params["brain"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-type"], params["food-lifespan"],

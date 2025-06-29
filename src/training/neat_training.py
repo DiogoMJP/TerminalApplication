@@ -106,18 +106,24 @@ class NeatTraining(Training):
 		} | super().to_dict()
 	
 	@staticmethod
-	def get_parameters() -> tuple[str, ...]:
+	def get_parameters() -> tuple[tuple[str, type], ...]:
 		return (
-			"n-generations", "width", "height", "n-agents", "agent-type", "agents-lifespan",
-			"agents-lifespan-extension", "food-type", "food-lifespan", "perception-distance", "eating-distance",
-			"eating-number", "max-time-steps", "perception-processor-type", "simulation-type", "config-file"
+			("n-generations", int), ("width", int), ("height", int), ("n-agents", int),
+			("agent-type", str), ("agents-lifespan", int), ("agents-lifespan-extension", int),
+			("food-type", int), ("food-lifespan", int), ("perception-distance", int), ("eating-distance", int),
+			("eating-number", int), ("max-time-steps", int), ("perception-processor-type", int),
+			("simulation-type", str), ("config-file", str)
 		)
 	
 	@staticmethod
 	def create_from_parameters(params: dict[str, Any]) -> 'NeatTraining':
-		for key in __class__.get_parameters():
+		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
+			if type(params[key]) != param_type:
+				raise Exception(
+					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
+				)
 		training = NeatTraining(
 			params["n-generations"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-type"], params["food-lifespan"],

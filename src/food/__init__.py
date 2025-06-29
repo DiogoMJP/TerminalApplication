@@ -12,7 +12,7 @@ def create_food(food_type: str, params: dict[str, Any]) -> Food:
 			raise Exception(f"Invalid food type: {food_type}")
 	except Exception as e: raise
 
-def get_food_parameters(food_type: str) -> tuple[str, ...]:
+def get_food_parameters(food_type: str) -> tuple[tuple[str, type], ...]:
 	if food_type == "default-food":
 		return DefaultFood.get_parameters()
 	else:

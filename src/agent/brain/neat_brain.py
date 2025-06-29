@@ -12,6 +12,8 @@ if TYPE_CHECKING:
 	from src.agent.brain.neural_network	import NeuralNetwork
 	from src.food						import Food
 
+	from neat.nn	import FeedForwardNetwork
+
 
 class NeatBrain(Brain):
 	def __init__(self, neat_net: NeuralNetwork, perception_processor: PerceptionProcessor):
@@ -53,14 +55,18 @@ class NeatBrain(Brain):
 		)
 	
 	@staticmethod
-	def get_parameters() -> tuple[str, ...]:
-		return ("neat-neural-network", "perception-processor")
+	def get_parameters() -> tuple[tuple[str, type], ...]:
+		return (("neat-neural-network", FeedForwardNetwork), ("perception-processor-type", str))
 	
 	@staticmethod
 	def create_from_parameters(params: dict[str, Any]) -> 'NeatBrain':
-		for key in __class__.get_parameters():
+		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
+			if type(params[key]) != param_type:
+				raise Exception(
+					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
+				)
 		try:
 			neural_network = create_neural_network("neat-neural-network", params)
 			perception_processor = create_perception_processor(params["perception-processor-type"], params)

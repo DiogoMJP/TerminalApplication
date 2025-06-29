@@ -15,7 +15,7 @@ def create_simulation(simulation_type: str, params: dict[str, Any]) -> Simulatio
 			raise Exception(f"Invalid simulation type: {simulation_type}")
 	except Exception as e: raise
 
-def get_simulation_parameters(simulation_type: str) -> tuple[str, ...]:
+def get_simulation_parameters(simulation_type: str) -> tuple[tuple[str, type], ...]:
 	if simulation_type == "random-food-simulation":
 		return RandomFoodSimulation.get_parameters()
 	elif simulation_type == "fixed-food-simulation":
@@ -26,5 +26,5 @@ def get_simulation_parameters(simulation_type: str) -> tuple[str, ...]:
 def get_simulation_types() -> list[str]:
 	return [
 		"random-food-simulation",
-		"fixed-food-simulation",
+		"fixed-food-simulation"
 	]

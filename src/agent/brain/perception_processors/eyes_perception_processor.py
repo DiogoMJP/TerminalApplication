@@ -83,14 +83,18 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 		}
 	
 	@staticmethod
-	def get_parameters() -> tuple[str, ...]:
-		return ("n-sensors", "fov")
+	def get_parameters() -> tuple[tuple[str, type], ...]:
+		return (("n-sensors", int), ("fov", int))
 	
 	@staticmethod
 	def create_from_parameters(params) -> 'EyesPerceptionProcessor':
-		for key in __class__.get_parameters():
+		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
+			if type(params[key]) != param_type:
+				raise Exception(
+					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
+				)
 		return EyesPerceptionProcessor(params["n-sensors"], params["fov"])
 
 	@staticmethod

@@ -15,7 +15,7 @@ def create_agent(agent_type: str, params: dict[str, Any]) -> Agent:
 			raise Exception(f"Invalid agent type: {agent_type}")
 	except Exception as e: raise
 
-def get_agent_parameters(agent_type: str) -> tuple[str, ...]:
+def get_agent_parameters(agent_type: str) -> tuple[tuple[str, type], ...]:
 	if agent_type == "default-agent":
 		return DefaultAgent.get_parameters()
 	if agent_type == "stopped-by-walls-agent":

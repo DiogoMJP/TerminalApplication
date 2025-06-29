@@ -48,17 +48,21 @@ class DefaultAgent(Agent):
 		}
 
 	@staticmethod
-	def get_parameters() -> tuple[str, ...]:
+	def get_parameters() -> tuple[tuple[str, type], ...]:
 		return (
-			"brain", "width", "height", "agents-lifespan", "agents-lifespan-extension",
-			"perception-distance", "eating-distance"
+			("brain", Brain), ("width", int), ("height", int), ("agents-lifespan", int),
+			("agents-lifespan-extension", int), ("perception-distance", int), ("eating-distance", int)
 		)
 	
 	@staticmethod
 	def create_from_parameters(params: dict[str, Any]) -> 'DefaultAgent':
-		for key in __class__.get_parameters():
+		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
+			if type(params[key]) != param_type:
+				raise Exception(
+					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
+				)
 		return DefaultAgent(
 			params["brain"], params["width"], params["height"], params["agents-lifespan"],
 			params["agents-lifespan-extension"], params["perception-distance"], params["eating-distance"]

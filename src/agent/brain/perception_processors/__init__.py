@@ -21,7 +21,7 @@ def create_perception_processor(perception_processor_type: str, params: dict[str
 			raise Exception(f"Invalid perception processor type: {perception_processor_type}")
 	except Exception as e: raise
 
-def get_perception_processor_parameters(perception_processor_type: str) -> tuple[str, ...]:
+def get_perception_processor_parameters(perception_processor_type: str) -> tuple[tuple[str, type], ...]:
 	if perception_processor_type == "food-distance-perception-processor":
 		return FoodDistancePerceptionProcessor.get_parameters()
 	elif perception_processor_type == "food-agent-distance-perception-processor":

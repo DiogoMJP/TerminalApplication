@@ -30,14 +30,21 @@ class DefaultFood(Food):
 		}
 	
 	@staticmethod
-	def get_parameters() -> tuple[str, ...]:
-		return ("x", "y", "eating-number", "first-time-step", "food-lifespan", "perception-distance")
+	def get_parameters() -> tuple[tuple[str, type], ...]:
+		return (
+			("x", int), ("y", int), ("eating-number", int), ("first-time-step", int),
+			("food-lifespan", int), ("perception-distance", int)
+		)
 	
 	@staticmethod
 	def create_from_parameters(params: dict[str, Any]) -> 'DefaultFood':
-		for key in __class__.get_parameters():
+		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
+			if type(params[key]) != param_type:
+				raise Exception(
+					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
+				)
 		return DefaultFood(
 			params["x"], params["y"], params["eating-number"], params["first-time-step"],
 			params["food-lifespan"], params["perception-distance"]

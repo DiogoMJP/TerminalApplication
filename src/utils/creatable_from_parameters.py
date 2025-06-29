@@ -5,7 +5,7 @@ from typing import Any
 class CreatableFromParameters(ABC):
 	@staticmethod
 	@abstractmethod
-	def get_parameters() -> tuple[str, ...]:
+	def get_parameters() -> tuple[tuple[str, type], ...]:
 		raise NotImplementedError(f"{__class__.__name__}: 'get_parameters' must be implemented in subclasses")
 	
 	@staticmethod

@@ -12,7 +12,7 @@ def create_neural_network(neural_network_type: str, params: dict[str, Any]) -> N
 			raise Exception(f"Invalid neural network type: {neural_network_type}")
 	except Exception as e: raise
 
-def get_neural_network_parameters(neural_network_type: str) -> tuple[str, ...]:
+def get_neural_network_parameters(neural_network_type: str) -> tuple[tuple[str, type], ...]:
 	if neural_network_type == "neat-neural-network":
 		return NeatNeuralNetwork.get_parameters()
 	else:

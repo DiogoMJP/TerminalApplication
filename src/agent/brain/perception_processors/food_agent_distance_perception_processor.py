@@ -44,7 +44,7 @@ class FoodAgentDistancePerceptionProcessor(PerceptionProcessor):
 		return {"type"	: "food-agent-distance-perception-processor"}
 	
 	@staticmethod
-	def get_parameters() -> tuple[str, ...]:
+	def get_parameters() -> tuple[tuple[str, type], ...]:
 		return tuple()
 	
 	@staticmethod
