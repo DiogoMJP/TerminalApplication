@@ -73,7 +73,7 @@ class Simulation(CreatableFromParameters):
 			self.main_loop_thread.start()
 	
 	def generate_agent_parameters(self) -> dict[str, Any]:
-		agent_params = get_agent_parameters(self.agent_type)
+		agent_params = [param[0] for param in get_agent_parameters(self.agent_type)]
 		params = {}
 		if "brain" in agent_params:
 			params["brain"] = self.brain
@@ -92,7 +92,7 @@ class Simulation(CreatableFromParameters):
 		return params
 	
 	def generate_food_parameters(self) -> dict[str, Any]:
-		food_params = get_food_parameters("default-food")
+		food_params = [param[0] for param in get_food_parameters("default-food")]
 		params = {}
 		if "x" in food_params:
 			params["x"] = int(random() * self.width)

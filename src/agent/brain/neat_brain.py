@@ -5,14 +5,13 @@ from src.agent.brain.neural_network			import NeatNeuralNetwork, create_neural_ne
 from src.agent.brain.perception_processors	import PerceptionProcessor, \
 	create_perception_processor, load_perception_processor_from_data
 
-from typing import Any, TYPE_CHECKING
+from neat.nn	import FeedForwardNetwork
+from typing		import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.agent						import Agent
 	from src.agent.brain.neural_network	import NeuralNetwork
 	from src.food						import Food
-
-	from neat.nn	import FeedForwardNetwork
 
 
 class NeatBrain(Brain):
@@ -63,7 +62,7 @@ class NeatBrain(Brain):
 		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
-			if type(params[key]) != param_type:
+			if not isinstance(params[key], param_type):
 				raise Exception(
 					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
 				)

@@ -91,7 +91,7 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
-			if type(params[key]) != param_type:
+			if not isinstance(params[key], param_type):
 				raise Exception(
 					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
 				)

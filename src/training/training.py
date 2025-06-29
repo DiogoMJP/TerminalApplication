@@ -52,7 +52,7 @@ class Training(CreatableFromParameters):
 		return params
 	
 	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:
-		simulation_params = get_simulation_parameters(self.simulation_type)
+		simulation_params = [param[0] for param in get_simulation_parameters(self.simulation_type)]
 		params = {
 			"brain"						: brain,
 			"width"						: self.width,

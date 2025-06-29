@@ -110,8 +110,8 @@ class NeatTraining(Training):
 		return (
 			("n-generations", int), ("width", int), ("height", int), ("n-agents", int),
 			("agent-type", str), ("agents-lifespan", int), ("agents-lifespan-extension", int),
-			("food-type", int), ("food-lifespan", int), ("perception-distance", int), ("eating-distance", int),
-			("eating-number", int), ("max-time-steps", int), ("perception-processor-type", int),
+			("food-type", str), ("food-lifespan", int), ("perception-distance", int), ("eating-distance", int),
+			("eating-number", int), ("max-time-steps", int), ("perception-processor-type", str),
 			("simulation-type", str), ("config-file", str)
 		)
 	
@@ -120,7 +120,7 @@ class NeatTraining(Training):
 		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
-			if type(params[key]) != param_type:
+			if not isinstance(params[key], param_type):
 				raise Exception(
 					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
 				)

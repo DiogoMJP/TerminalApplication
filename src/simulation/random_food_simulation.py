@@ -1,12 +1,10 @@
 from __future__	import annotations
 
-from src.simulation import Simulation
+from src.agent.brain	import Brain
+from src.simulation 	import Simulation
 
 from random import random
-from typing import Any, TYPE_CHECKING
-
-if TYPE_CHECKING:
-	from src.agent.brain	import Brain
+from typing import Any
 
 
 class RandomFoodSimulation(Simulation):
@@ -59,7 +57,7 @@ class RandomFoodSimulation(Simulation):
 	@staticmethod
 	def get_parameters() -> tuple[tuple[str, type], ...]:
 		return (
-			("brain", Brain), ("width", int), ("height", int), ("n-agents", int), ("agent-type", int),
+			("brain", Brain), ("width", int), ("height", int), ("n-agents", int), ("agent-type", str),
 			("agents-lifespan", int), ("agents-lifespan-extension", int), ("food-type", str), ("food-lifespan", int),
 			("perception-distance", int), ("eating-distance", int), ("eating-number", int), ("max-time-steps", int),
 			("food-spawn-rate", float)
@@ -70,7 +68,7 @@ class RandomFoodSimulation(Simulation):
 		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
-			if type(params[key]) != param_type:
+			if not isinstance(params[key], param_type):
 				raise Exception(
 					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
 				)
