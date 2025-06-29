@@ -22,3 +22,9 @@ def get_simulation_parameters(simulation_type: str) -> tuple[str, ...]:
 		return FixedFoodSimulation.get_parameters()
 	else:
 		raise Exception(f"Invalid simulation type: {simulation_type}")
+
+def get_simulation_types() -> list[str]:
+	return [
+		"random-food-simulation",
+		"fixed-food-simulation",
+	]

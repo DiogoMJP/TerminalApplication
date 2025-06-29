@@ -1,5 +1,5 @@
-from src.food.food			import Food
-from src.food.default_food	import DefaultFood
+from src.food.food				import Food
+from src.food.default_food		import DefaultFood
 
 from typing import Any
 
@@ -17,3 +17,6 @@ def get_food_parameters(food_type: str) -> tuple[str, ...]:
 		return DefaultFood.get_parameters()
 	else:
 		raise Exception(f"Invalid food type: {food_type}")
+
+def get_food_types() -> list[str]:
+	return ["default-food"]

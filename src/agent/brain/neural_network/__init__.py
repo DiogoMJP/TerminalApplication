@@ -17,3 +17,6 @@ def get_neural_network_parameters(neural_network_type: str) -> tuple[str, ...]:
 		return NeatNeuralNetwork.get_parameters()
 	else:
 		raise Exception(f"Invalid neural network type: {neural_network_type}")
+
+def get_neural_network_types() -> list[str]:
+	return ["neat-neural-network"]

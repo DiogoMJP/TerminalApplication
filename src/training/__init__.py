@@ -16,3 +16,6 @@ def get_training_parameters(training_type: str) -> Tuple[str, ...]:
 		return NeatTraining.get_parameters()
 	else:
 		raise Exception(f"Invalid training type: {training_type}")
+
+def get_training_types() -> list[str]:
+	return ["neat-training"]

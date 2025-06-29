@@ -22,3 +22,9 @@ def get_agent_parameters(agent_type: str) -> tuple[str, ...]:
 		return StoppedByWallsAgent.get_parameters()
 	else:
 		raise Exception(f"Invalid agent type: {agent_type}")
+
+def get_agent_types() -> list[str]:
+	return [
+		"default-agent",
+		"stopped-by-walls-agent"
+	]

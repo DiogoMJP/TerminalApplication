@@ -44,3 +44,11 @@ def load_perception_processor_from_data(data: dict[str, Any]) -> PerceptionProce
 		return EyesPerceptionProcessor.load_from_data(data)
 	else:
 		raise Exception(f"Invalid perception processor type: {data['type']}")
+
+def get_perception_processor_types() -> list[str]:
+	return [
+		"food-distance-perception-processor",
+		"food-agent-distance-perception-processor",
+		"normalised-input-perception-processor",
+		"eyes-perception-processor"
+	]

@@ -29,3 +29,6 @@ def load_brain_from_data(data: dict[str, Any]) -> Brain:
 		return NeatBrain.load_from_data(data)
 	else:
 		raise Exception(f"Invalid brain type: {data['type']}")
+
+def get_brain_types() -> list[str]:
+	return ["neat-brain"]
