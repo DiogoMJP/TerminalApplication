@@ -2,12 +2,11 @@ from __future__	import annotations
 
 from src.agent.brain.perception_processors	import PerceptionProcessor
 
-from math	import atan2, degrees, hypot, sqrt
-from typing	import Any, TYPE_CHECKING
+from math	import atan2, degrees, hypot
+from typing	import Any, Unpack, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from src.agent	import Agent
-	from src.food	import Food
+	from src.agent.brain.perception_processors	import EnvironmentData
 
 
 class NormalisedInputPerceptionProcessor(PerceptionProcessor):
@@ -15,9 +14,16 @@ class NormalisedInputPerceptionProcessor(PerceptionProcessor):
 		super().__init__(6)
 
 	def process_input(
-		self, state: dict[str, Any], perception_distance: int, food_list: list[Food],
-		agent_list: list[Agent], width: int, height: int
+    	self, state: dict[str, Any], perception_distance: int, width: int, height: int,
+		**environment_data: Unpack[EnvironmentData]
 	) -> tuple[float, float, float, float, float, float]:
+		if "food_list" not in environment_data:
+			raise Exception(f"{self.__class__.__name__}: Missing required environment data: food_list")
+		if "agent_list" not in environment_data:
+			raise Exception(f"{self.__class__.__name__}: Missing required environment data: agent_list")
+		food_list = environment_data["food_list"]
+		agent_list = environment_data["agent_list"]
+
 		x = state["x"]; y = state["y"]; angle = state["angle"]
 		output = [-1.0, 1.0, 1.0, -1.0, 1.0, 1.0]
 		

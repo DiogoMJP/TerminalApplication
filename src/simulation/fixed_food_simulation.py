@@ -31,7 +31,9 @@ class FixedFoodSimulation(Simulation):
 			while self.get_n_food() < self.n_food:
 				self.create_food()
 			for i, agent in enumerate(self.agents):
-				agent.simulate(self.time_step, self.food, self.agents[:i]+self.agents[i+1:])
+				agent.simulate(
+					self.time_step, food_list=self.food, agent_list=self.agents[:i]+self.agents[i+1:]
+				)
 			if self.time_step == self.max_time_steps - 1 or self.get_n_alive_agents() == 0:
 				self.finished = True
 				self.last_time_step = self.time_step

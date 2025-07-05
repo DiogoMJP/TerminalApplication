@@ -3,11 +3,11 @@ from __future__	import annotations
 from src.utils	import CreatableFromParameters
 
 from abc	import abstractmethod
-from typing	import Any, TYPE_CHECKING
+from typing	import Any, Unpack, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from src.agent.brain	import Brain
-	from src.food			import Food
+	from src.agent.brain						import Brain
+	from src.agent.brain.perception_processors	import EnvironmentData
 
 
 class Agent(CreatableFromParameters):
@@ -44,7 +44,7 @@ class Agent(CreatableFromParameters):
 		self.history += [{key: val for key, val in self.state.items()}]
 
 	@abstractmethod
-	def simulate(self, time_step: int, food_list: list[Food], agent_list: list['Agent']) -> None:
+	def simulate(self, time_step: int, **environment_data: Unpack[EnvironmentData]) -> None:
 		raise NotImplementedError(f"{self.__class__.__name__}: simulate method must be implemented in subclasses")
 	
 	@abstractmethod

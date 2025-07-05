@@ -2,21 +2,20 @@ from __future__	import annotations
 
 from src.utils	import CreatableFromParameters, Loadable
 
-import numpy as np
 from abc	import abstractmethod
 from math	import sqrt
-from typing	import Any, Dict, List, Tuple, TYPE_CHECKING
+from typing	import Any, Tuple, Unpack, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from src.agent	import Agent
-	from src.food	import Food
+	from src.agent.brain.perception_processors	import EnvironmentData
+	from src.food								import Food
 
 
 class PerceptionProcessor(CreatableFromParameters, Loadable):
 	def __init__(self, n_input: int):
 		self.n_input: int = n_input
 	
-	def get_closest_food(self, state: Dict[str, Any], food_list: List[Food]) -> tuple[Food | None, float]:
+	def get_closest_food(self, state: dict[str, Any], food_list: list[Food]) -> tuple[Food | None, float]:
 		x, y = state["x"], state["y"]
 
 		min_dist_sq = float('inf')
@@ -39,11 +38,11 @@ class PerceptionProcessor(CreatableFromParameters, Loadable):
 
 	@abstractmethod
 	def process_input(
-		self, state: Dict[str, Any], perception_distance: int, food_list: List[Food],
-		agent_list: List[Agent], width: int, height: int
+		self, state: dict[str, Any], perception_distance: int, width: int, height: int,
+		**environment_data: Unpack[EnvironmentData]
 	) -> Tuple[float, ...]:
 		raise NotImplementedError(f"{self.__class__.__name__}: process_input method must be implemented in subclasses")
 	
 	@abstractmethod
-	def to_dict(self) -> Dict[str, Any]:
+	def to_dict(self) -> dict[str, Any]:
 		raise NotImplementedError(f"{self.__class__.__name__}: to_dict method must be implemented in subclasses")

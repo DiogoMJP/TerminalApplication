@@ -4,7 +4,18 @@ from src.agent.brain.perception_processors.food_agent_distance_perception_proces
 from src.agent.brain.perception_processors.normalised_input_perception_processor	import NormalisedInputPerceptionProcessor
 from src.agent.brain.perception_processors.eyes_perception_processor				import EyesPerceptionProcessor
 
-from typing	import Any
+from typing				import Any, TypedDict, TYPE_CHECKING
+from typing_extensions	import NotRequired
+
+if TYPE_CHECKING:
+	from src.agent	import Agent
+	from src.food	import Food
+
+
+class EnvironmentData(TypedDict):
+	food_list	: NotRequired[list['Food']]
+	agent_list	: NotRequired[list['Agent']]
+	sound_list	: NotRequired[list[tuple[tuple[int, ...], tuple[int, ...]]]]
 
 
 def create_perception_processor(perception_processor_type: str, params: dict[str, Any]) -> PerceptionProcessor:

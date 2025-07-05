@@ -1,9 +1,12 @@
 from src.agent			import Agent
 from src.agent.brain	import Brain
-from src.food			import Food
 
-from math	import cos, sin, radians
-from typing import Any
+from math				import cos, sin, radians
+from typing 			import Any, TYPE_CHECKING
+from typing_extensions	import Unpack
+
+if TYPE_CHECKING:
+	from src.agent.brain.perception_processors	import EnvironmentData
 
 
 class DefaultAgent(Agent):
@@ -19,23 +22,29 @@ class DefaultAgent(Agent):
 	def set_history(self, history: list[tuple[Any]], keys: list[str] = ["x", "y", "angle"]) -> None:
 		super().set_history(history, keys)
 
-	def simulate(self, time_step: int, food_list: list[Food], agent_list: list[Agent]) -> None:
+	def simulate(self, time_step: int, **environment_data: Unpack['EnvironmentData']) -> None:
 		if self.alive:
 			if (time_step == self.lifespan):
 				self.alive = False
 				self.last_time_step = time_step
 			else:
 				l_rot, r_rot, speed = self.brain.get_action(
-					self.state, self.perception_distance, food_list,
-					agent_list, self.width, self.height
+					self.state, self.perception_distance, self.width, self.height,
+					**environment_data
 				)
+				if "food_list" not in environment_data or environment_data["food_list"] is None:
+					raise Exception(f"{self.__class__.__name__}: Missing required environment data: food_list")
 				change = -3 if l_rot else 3 if r_rot else 0
 				self.set_in_state("angle", self.get_from_state("angle") + change)
 				self.set_in_state("angle", (self.get_from_state("angle") + 180) % 360 - 180)
 				if speed:
-					self.set_in_state("x", int((self.get_from_state("x") + cos(radians(self.get_from_state("angle"))) * 4) % self.width))
-					self.set_in_state("y", int((self.get_from_state("y") + sin(radians(self.get_from_state("angle"))) * 4) % self.height))
-				food, dist = self.brain.get_closest_food(self.state, food_list)
+					self.set_in_state(
+						"x", int((self.get_from_state("x") + cos(radians(self.get_from_state("angle"))) * 4) % self.width)
+					)
+					self.set_in_state(
+						"y", int((self.get_from_state("y") + sin(radians(self.get_from_state("angle"))) * 4) % self.height)
+					)
+				food, dist = self.brain.get_closest_food(self.state, environment_data["food_list"])
 				if food != None and dist < self.eating_distance:
 					food.eaten_by += [self]
 			self.save_state()
