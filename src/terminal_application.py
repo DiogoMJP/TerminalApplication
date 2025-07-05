@@ -169,6 +169,8 @@ class TerminalApplication(object):
 			ax.plot(vals.keys(), [vals[key][i] for key in vals.keys()], label=f"{i}")
 		wrap_labels(ax, list(vals.keys()), 15)
 		ax.legend()
+		plt.xlabel("Configuration Files")
+		plt.ylabel("Average Duration (time steps)")
 		fig.suptitle("Average agent performance")
 		fig.savefig(f"saved_data/{simulation_type}/average_performance.png")
 		plt.close('all')
