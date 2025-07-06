@@ -44,6 +44,7 @@ class Training(CreatableFromParameters):
 	
 	def generate_perception_processor_parameter(self) -> dict[str, Any]:
 		perception_processor_params = get_perception_processor_parameters(self.perception_processor_type)
+		perception_processor_params = [param[0] for param in perception_processor_params]
 		params = {}
 		if "n-sensors" in perception_processor_params and self.n_sensors != None:
 			params["n-sensors"] = self.n_sensors
@@ -52,7 +53,8 @@ class Training(CreatableFromParameters):
 		return params
 	
 	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:
-		simulation_params = [param[0] for param in get_simulation_parameters(self.simulation_type)]
+		simulation_params = get_simulation_parameters(self.simulation_type)
+		simulation_params = [param[0] for param in simulation_params]
 		params = {
 			"brain"						: brain,
 			"width"						: self.width,
