@@ -43,8 +43,8 @@ DEFAULT_PARAMS = {
 }
 
 SIMULATION_TYPES = [
-	"random-food-simulation"
-	# "fixed-food-simulation"
+	"random-food-simulation",
+	"fixed-food-simulation"
 ]
 
 CONFIGS = [
@@ -101,7 +101,7 @@ class TerminalApplication(object):
 						raise Exception(f"{self.__class__.__name__}: Invalid parameter: {key}")
 					else: self.params[key] = val
 				for eating_number in self.eating_numbers:
-					for id in range(5, 10):
+					for id in range(10):
 						self.train(simulation_type, config_file, eating_number, id)
 					self.create_graphs_from_training_data(simulation_type, config_file, eating_number)
 			self.generate_average_performance_graph(simulation_type)
@@ -176,7 +176,7 @@ class TerminalApplication(object):
 				for key in vals.keys()
 			]
 			stdev = [
-				sqrt(sum([(val - y_vals[j])**2 for val in vals[key][i]["average-performance"]]))
+				sqrt(sum([(val - y_vals[j])**2 for val in vals[key][i]["average-performance"]]) / (len(vals[key][i]["average-performance"]) - 1))
 				for j, key in enumerate(vals.keys())
 			]
 			ax.plot(x_vals, y_vals, label=f"{i}")
