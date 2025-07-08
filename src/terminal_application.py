@@ -176,11 +176,17 @@ class TerminalApplication(object):
 				for key in vals.keys()
 			]
 			stdev = [
-				sqrt(sum([(val - y_vals[j])**2 for val in vals[key][i]["average-performance"]]) / (len(vals[key][i]["average-performance"]) - 1))
+				sqrt(
+					sum([(val - y_vals[j])**2 for val in vals[key][i]["average-performance"]]) /
+					(len(vals[key][i]["average-performance"]) - 1)
+				)
 				for j, key in enumerate(vals.keys())
 			]
 			ax.plot(x_vals, y_vals, label=f"{i}")
-			ax.fill_between(x_vals, [val - std for val, std in zip(y_vals, stdev)], [val + std for val, std in zip(y_vals, stdev)], color='b', alpha=.15)
+			ax.fill_between(
+				x_vals, [val - std for val, std in zip(y_vals, stdev)],
+				[val + std for val, std in zip(y_vals, stdev)], color='b', alpha=.15
+			)
 		wrap_labels(ax, list(vals.keys()), 15)
 		ax.legend()
 		plt.xlabel("Configuration Files")
