@@ -114,7 +114,7 @@ class TerminalApplication(object):
 		self.params["simulation-type"] = simulation_type
 		self.params["config-file"] = f"config_files/{config_file}"
 		self.params["eating-number"] = eating_number
-		print(f"Running simulation {simulation_type} with config {config_file} and eating number {eating_number} and configs {self.params}")
+		print(f"Running simulation {simulation_type} with config {config_file}, eating number {eating_number}, and id {id} and configs {self.params}")
 		start = time()
 		training = create_training("neat-training", self.params)
 		training.start_training()
@@ -122,8 +122,7 @@ class TerminalApplication(object):
 		print(f"Training took {end - start:.2f} seconds")
 		average_performance, max_performance = self.get_training_result_performance(training)
 		Path(f"saved_data/{simulation_type}/{config_file}/{eating_number}").mkdir(parents=True, exist_ok=True)
-		for suffix in (".json", "_duration.png", "_fitness.png", "_food.png", "_nodes.png"):
-			Path(f"saved_data/{simulation_type}/{config_file}/{eating_number}{suffix}").unlink(missing_ok=True)
+		Path(f"saved_data/{simulation_type}/{config_file}/{eating_number}/{id}.json").unlink(missing_ok=True)
 		with open(f"saved_data/{simulation_type}/{config_file}/{eating_number}/{id}.json", "w+") as fp:
 			json.dump(training.to_dict() | {
 				"duration" : end - start,
@@ -192,6 +191,7 @@ class TerminalApplication(object):
 		plt.xlabel("Configuration Files")
 		plt.ylabel("Average Duration (time steps)")
 		fig.suptitle("Average agent performance")
+		Path(f"saved_data/{simulation_type}/average_performance.png").unlink(missing_ok=True)
 		fig.savefig(f"saved_data/{simulation_type}/average_performance.png")
 		plt.close('all')
 
@@ -215,6 +215,7 @@ class TerminalApplication(object):
 		plt.xlabel(data["x-label"])
 		plt.ylabel(data["y-label"])
 		plt.title(data["title"])
+		Path(path + f"/{data['filename']}.png").unlink(missing_ok=True)
 		plt.savefig(path + f"/{data['filename']}.png")
 		plt.close('all')
 
