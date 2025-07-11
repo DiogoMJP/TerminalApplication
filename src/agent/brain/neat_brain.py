@@ -4,8 +4,8 @@ from src.agent.brain						import Brain
 from src.agent.brain.neural_network			import NeatNeuralNetwork, create_neural_network
 from src.agent.brain.perception_processors	import create_perception_processor, load_perception_processor_from_data
 
-from neat.nn	import FeedForwardNetwork
-from typing		import Any, Unpack, TYPE_CHECKING
+from neat.nn			import FeedForwardNetwork
+from typing				import Any, Unpack, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.agent.brain.neural_network			import NeuralNetwork

@@ -123,5 +123,6 @@ class NeatTrainingReplay(TrainingReplay):
 		if "brain" in data: training_replay.brain = load_brain_from_data(data["brain"])
 		if "n-sensors" in data: training_replay.n_sensors = data["n-sensors"]
 		if "fov" in data: training_replay.fov = data["fov"]
+		if "n-freq" in data: training_replay.n_freq = data["n-freq"]
 
 		return training_replay

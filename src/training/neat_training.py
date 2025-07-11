@@ -134,4 +134,5 @@ class NeatTraining(Training):
 		if "n-food" in params: training.n_food = params["n-food"]
 		if "n-sensors" in params: training.n_sensors = params["n-sensors"]
 		if "fov" in params: training.fov = params["fov"]
+		if "n-freq" in params: training.n_freq = params["n-freq"]
 		return training

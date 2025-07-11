@@ -43,6 +43,7 @@ class TrainingReplay(Loadable):
 		self.brain						: Optional[Brain]	= None
 		self.n_sensors					: Optional[int]		= None
 		self.fov						: Optional[int]		= None
+		self.n_freq						: Optional[int]		= None
 	
 	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:
 		simulation_params = get_simulation_parameters(self.simulation_type)

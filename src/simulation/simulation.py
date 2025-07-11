@@ -7,12 +7,13 @@ from src.utils	import CreatableFromParameters
 from abc		import abstractmethod
 from random		import random
 from threading	import Thread
-from typing		import Any, TYPE_CHECKING
+from typing		import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from src.agent			import Agent
-	from src.agent.brain	import Brain
-	from src.food			import Food
+	from src.agent								import Agent
+	from src.agent.brain						import Brain
+	from src.agent.brain.perception_processors	import Sound
+	from src.food								import Food
 
 
 class Simulation(CreatableFromParameters):
@@ -35,13 +36,14 @@ class Simulation(CreatableFromParameters):
 		self.eating_number				: int	= eating_number
 		self.max_time_steps				: int	= max_time_steps
 		
-		self.last_time_step		: int			= 0
-		self.finished			: bool			= False
-		self.time_step			: int			= 0
-		self.agents				: list[Agent]	= []
-		self.food				: list[Food]	= []
-		self.finished_food		: list[Food]	= []
-		self.main_loop_thread	: Thread | None	= None
+		self.last_time_step		: int				= 0
+		self.finished			: bool				= False
+		self.time_step			: int				= 0
+		self.agents				: list[Agent]		= []
+		self.food				: list[Food]		= []
+		self.finished_food		: list[Food]		= []
+		self.sounds				: list[Sound]		= []
+		self.main_loop_thread	: Optional[Thread]	= None
 
 	def get_n_alive_agents(self) -> int:
 		return len([1 for agent in self.agents if agent.alive])
@@ -66,6 +68,8 @@ class Simulation(CreatableFromParameters):
 		dead_food = [food for food in self.food if not food.alive]
 		self.finished_food += dead_food
 		self.food = [food for food in self.food if food.alive]
+	def add_sound(self, sound: Sound):
+		self.sounds += [sound]
 	
 	def start_loop(self) -> None:
 		if not self.finished:

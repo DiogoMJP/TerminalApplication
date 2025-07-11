@@ -37,6 +37,7 @@ class Training(CreatableFromParameters):
 		self.brain						: Optional[Brain]	= None
 		self.n_sensors					: Optional[int]		= None
 		self.fov						: Optional[int]		= None
+		self.n_freq						: Optional[int]		= None
 	
 	@abstractmethod
 	def start_training(self) -> None:
@@ -50,6 +51,8 @@ class Training(CreatableFromParameters):
 			params["n-sensors"] = self.n_sensors
 		if "fov" in perception_processor_params and self.fov != None:
 			params["fov"] = self.fov
+		if "n-freq" in perception_processor_params and self.n_freq != None:
+			params["n-freq"] = self.n_freq
 		return params
 	
 	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:
@@ -99,4 +102,5 @@ class Training(CreatableFromParameters):
 		if self.brain != None: data |= {"brain" : self.brain.to_dict()}
 		if self.n_sensors != None: data |= {"n-sensors" : self.n_sensors}
 		if self.fov != None: data |= {"fov" : self.fov}
+		if self.n_freq != None: data |= {"n-freq" : self.n_freq}
 		return data

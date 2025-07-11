@@ -2,8 +2,8 @@ from __future__	import annotations
 
 from src.utils	import CreatableFromParameters, Loadable
 
-from abc	import abstractmethod
-from typing	import Any, Unpack, TYPE_CHECKING
+from abc				import abstractmethod
+from typing				import Any, Unpack, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.agent.brain.perception_processors	import EnvironmentData, PerceptionProcessor
