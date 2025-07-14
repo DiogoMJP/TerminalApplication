@@ -62,7 +62,7 @@
     
     # network parameters
     num_hidden  = 0
-    num_inputs  = 23
+    num_inputs  = 18
     num_outputs = 5
     
     # node response options

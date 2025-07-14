@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 class EyesPerceptionProcessor(PerceptionProcessor):
 	def __init__(self, n_sensors: int, fov: int):
-		super().__init__(n_sensors * 2)
+		super().__init__(n_sensors * 3)
 		self.n_sensors	: int	= n_sensors
 		self.fov		: int	= fov
 		self.view_cone	: float	= fov / n_sensors
@@ -39,7 +39,7 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 			)
 		]
 
-		output = [[0.0, 0.0, 0.0, 1.0] for _ in range(self.n_sensors)]
+		output = [[0.0, 0.0, 0.0] for _ in range(self.n_sensors)]
 
 		def process_entity(e_x: float, e_y: float, entity_key: int) -> None:
 			dx = e_x - x
@@ -63,9 +63,9 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 					best_i = i
 			if degrees(acos(max(min(best_dot, 1), 0))) < self.view_cone / 2:
 				rel_dist = dist / perception_distance
-				if output[best_i][-1] > rel_dist:
-					output[best_i] = [0.0, 0.0, 0.0, rel_dist]
-					output[best_i][entity_key] = 1.0
+				if 1 - max(output[best_i]) > rel_dist:
+					output[best_i] = [0.0, 0.0, 0.0]
+					output[best_i][entity_key] = 1 - rel_dist
 
 		for food in food_list:
 			if food.alive:
@@ -79,7 +79,7 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 			if output[i][1] == 0.0 and output[i][2] == 0.0:
 				if x + perception_distance * cones[i][0] < 0 or x + perception_distance * cones[i][0] >= width or \
 					y + perception_distance * cones[i][1] < 0 or y + perception_distance * cones[i][1] >= height:
-					output[i] = [1.0, 0.0, 0.0, 0.0]
+					output[i] = [1.0, 0.0, 0.0]
 		
 		return tuple(val for set in output for val in set)
 

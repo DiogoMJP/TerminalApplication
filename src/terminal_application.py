@@ -44,27 +44,27 @@ DEFAULT_PARAMS = {
 }
 
 SIMULATION_TYPES = [
-	# "random-food-simulation",
+	"random-food-simulation",
 	"fixed-food-simulation"
 ]
 
 CONFIGS = [
-	# ("01_starting_config", {
-	# 	"perception-processor-type" : "food-agent-distance-perception-processor"
-	# }),
-	# ("02_weight_range_change_config", {
-	# 	"perception-processor-type" : "food-agent-distance-perception-processor"
-	# }),
-	# ("03_weight_params_change_config", {
-	# 	"perception-processor-type" : "food-agent-distance-perception-processor"
-	# }),
-	# ("04_normalise_input_config", {
-	# 	"perception-processor-type" : "normalised-input-perception-processor"
-	# }),
-	# ("05_eyes_implementation_config", {
-	# 	"perception-processor-type" : "eyes-perception-processor",
-	# 	"perception-distance"		: 400
-	# }),
+	("01_starting_config", {
+		"perception-processor-type" : "food-agent-distance-perception-processor"
+	}),
+	("02_weight_range_change_config", {
+		"perception-processor-type" : "food-agent-distance-perception-processor"
+	}),
+	("03_weight_params_change_config", {
+		"perception-processor-type" : "food-agent-distance-perception-processor"
+	}),
+	("04_normalise_input_config", {
+		"perception-processor-type" : "normalised-input-perception-processor"
+	}),
+	("05_eyes_implementation_config", {
+		"perception-processor-type" : "eyes-perception-processor",
+		"perception-distance"		: 400
+	}),
 	("06_eyes_sound_implementation_config", {
 		"perception-processor-type"	: "eyes-sound-perception-processor",
 		"agent-type"				: "sound-agent"
@@ -112,7 +112,6 @@ class TerminalApplication(object):
 			self.generate_average_performance_graph(simulation_type)
 		print()
 		print("Training completed.")
-		# self.watch_simulation("random-food-simulation", "01_starting_config", 1)
 	
 	def train(self, simulation_type: str, config_file: str, eating_number: int, id: int) -> None:
 		print()

@@ -7,8 +7,7 @@ from src.agent.brain.perception_processors.normalised_input_perception_processor
 from src.agent.brain.perception_processors.eyes_perception_processor				import EyesPerceptionProcessor
 from src.agent.brain.perception_processors.eyes_sound_perception_processor			import EyesSoundPerceptionProcessor
 
-from typing				import Any, TypedDict, TYPE_CHECKING
-from typing_extensions	import NotRequired
+from typing	import Any, NotRequired, TypedDict, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.agent	import Agent

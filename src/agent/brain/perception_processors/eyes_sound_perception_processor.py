@@ -2,9 +2,8 @@ from __future__	import annotations
 
 from src.agent.brain.perception_processors	import PerceptionProcessor
 
-from math				import acos, atan2, cos, degrees, radians, sin, sqrt, tanh, pi
-from typing				import Any, TYPE_CHECKING
-from typing_extensions	import Unpack
+from math	import acos, atan2, cos, degrees, radians, sin, sqrt, tanh
+from typing	import Any, Unpack, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.agent.brain.perception_processors	import EnvironmentData
@@ -12,7 +11,7 @@ if TYPE_CHECKING:
 
 class EyesSoundPerceptionProcessor(PerceptionProcessor):
 	def __init__(self, n_sensors: int, fov: int, n_freq: int):
-		super().__init__(n_sensors * 2 + n_freq + 1)
+		super().__init__(n_sensors * 3 + n_freq + 1)
 		self.n_sensors	: int	= n_sensors
 		self.fov		: int	= fov
 		self.view_cone	: float	= fov / n_sensors
@@ -42,7 +41,7 @@ class EyesSoundPerceptionProcessor(PerceptionProcessor):
 			)
 		]
 
-		eyes_output = [[0.0, 0.0, 0.0, 1.0] for _ in range(self.n_sensors)]
+		eyes_output = [[0.0, 0.0, 0.0] for _ in range(self.n_sensors)]
 		ears_output = [0.0 for _ in range(self.n_freq)]
 		sound_angle = 0.0
 
@@ -68,9 +67,9 @@ class EyesSoundPerceptionProcessor(PerceptionProcessor):
 					best_i = i
 			if degrees(acos(max(min(best_dot, 1), 0))) < self.view_cone / 2:
 				rel_dist = dist / perception_distance
-				if eyes_output[best_i][-1] > rel_dist:
-					eyes_output[best_i] = [0.0, 0.0, 0.0, rel_dist]
-					eyes_output[best_i][entity_key] = 1.0
+				if 1 - max(eyes_output[best_i]) > rel_dist:
+					eyes_output[best_i] = [0.0, 0.0, 0.0]
+					eyes_output[best_i][entity_key] = 1 - rel_dist
 
 		for food in food_list:
 			if food.alive:
@@ -84,7 +83,7 @@ class EyesSoundPerceptionProcessor(PerceptionProcessor):
 			if eyes_output[i][1] == 0.0 and eyes_output[i][2] == 0.0:
 				if x + perception_distance * cones[i][0] < 0 or x + perception_distance * cones[i][0] >= width or \
 					y + perception_distance * cones[i][1] < 0 or y + perception_distance * cones[i][1] >= height:
-					eyes_output[i] = [1.0, 0.0, 0.0, 0.0]
+					eyes_output[i] = [1.0, 0.0, 0.0]
 		
 		if len(sound_list) != 0:
 			sound_vec = [0.0, 0.0]
