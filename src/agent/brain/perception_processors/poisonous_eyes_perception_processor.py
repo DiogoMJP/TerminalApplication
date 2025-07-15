@@ -6,12 +6,10 @@ from math			import acos, cos, degrees, radians, sin, sqrt
 from typing			import Any, Unpack, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from src.agent	import Agent
 	from src.agent.brain.perception_processors	import EnvironmentData
-	from src.food	import Food
 
 
-class EyesPerceptionProcessor(PerceptionProcessor):
+class PoisonousEyesPerceptionProcessor(PerceptionProcessor):
 	def __init__(self, n_sensors: int, fov: int):
 		super().__init__(n_sensors * 3)
 		self.n_sensors	: int	= n_sensors
@@ -85,7 +83,7 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 
 	def to_dict(self) -> dict[str, Any]:
 		return {
-			"type"		: "eyes-perception-processor",
+			"type"		: "poisonous-eyes-perception-processor",
 			"n-sensors"	: self.n_sensors,
 			"fov"		: self.fov
 		}
@@ -95,7 +93,7 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 		return (("n-sensors", int), ("fov", int))
 	
 	@staticmethod
-	def create_from_parameters(params) -> 'EyesPerceptionProcessor':
+	def create_from_parameters(params) -> 'PoisonousEyesPerceptionProcessor':
 		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
@@ -103,8 +101,8 @@ class EyesPerceptionProcessor(PerceptionProcessor):
 				raise Exception(
 					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
 				)
-		return EyesPerceptionProcessor(params["n-sensors"], params["fov"])
+		return PoisonousEyesPerceptionProcessor(params["n-sensors"], params["fov"])
 
 	@staticmethod
-	def load_from_data(data: dict[str, Any]) -> 'EyesPerceptionProcessor':
-		return EyesPerceptionProcessor(data["n-sensors"], data["fov"])
+	def load_from_data(data: dict[str, Any]) -> 'PoisonousEyesPerceptionProcessor':
+		return PoisonousEyesPerceptionProcessor(data["n-sensors"], data["fov"])

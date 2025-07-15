@@ -1,24 +1,26 @@
 from __future__	import annotations
 
 from src.agent.brain	import Brain
+from src.food			import create_food, get_food_parameters
 from src.simulation		import Simulation
 
-from time		import time
-from typing 	import Any
+from random	import random
+from typing import Any
 
 
-class FixedFoodSimulation(Simulation):
+class PoisonousFoodSimulation(Simulation):
 	def __init__(
 		self, brain : Brain, width: int, height: int, n_agents: int, agent_type: str, agents_lifespan: int,
-		agents_lifespan_extension: int, food_type: str, food_lifespan: int, perception_distance: int,
-		eating_distance: int, eating_number: int, max_time_steps: int, n_food: int
+		agents_lifespan_extension: int, food_type: str, food_lifespan: int, poisonous_food_rate: float,
+		perception_distance: int, eating_distance: int, eating_number: int, max_time_steps: int, n_food: int
 	):
 		super().__init__(
 			brain, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
-			food_type, food_lifespan, 0.0, perception_distance, eating_distance, eating_number, max_time_steps
+			food_type, food_lifespan, poisonous_food_rate, perception_distance, eating_distance,
+			eating_number, max_time_steps
 		)
-		self.n_food	: int	= n_food
-		
+		self.n_food					: int	= n_food
+
 		self.create_agents()
 		while self.get_n_food() < self.n_food:
 			self.create_food()
@@ -53,7 +55,7 @@ class FixedFoodSimulation(Simulation):
 	
 	def to_dict(self) -> dict[str, Any]:
 		return {
-			"type"		: "fixed-food-simulation",
+			"type"		: "poisonous-food-simulation",
 			"duration"	: self.last_time_step,
 			"brain"		: self.brain.to_dict(),
 			"agents"	: [agent.to_dict() for agent in self.agents],
@@ -65,12 +67,12 @@ class FixedFoodSimulation(Simulation):
 		return (
 			("brain", Brain), ("width", int), ("height", int), ("n-agents", int), ("agent-type", str),
 			("agents-lifespan", int), ("agents-lifespan-extension", int), ("food-type", str), ("food-lifespan", int),
-			("perception-distance", int), ("eating-distance", int), ("eating-number", int), ("max-time-steps", int),
-			("n-food", int)
+			("poisonous-food-rate", float), ("perception-distance", int), ("eating-distance", int),
+			("eating-number", int), ("max-time-steps", int), ("n-food", int)
 		)
 	
 	@staticmethod
-	def create_from_parameters(params: dict[str, Any]) -> 'FixedFoodSimulation':
+	def create_from_parameters(params: dict[str, Any]) -> 'PoisonousFoodSimulation':
 		for key, param_type in __class__.get_parameters():
 			if key not in params:
 				raise Exception(f"{__class__.__name__}: Missing required parameter: {key}")
@@ -78,9 +80,9 @@ class FixedFoodSimulation(Simulation):
 				raise Exception(
 					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
 				)
-		return FixedFoodSimulation(
+		return PoisonousFoodSimulation(
 			params["brain"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-type"], params["food-lifespan"],
-			params["perception-distance"], params["eating-distance"], params["eating-number"],
+			params["poisonous-food-rate"], params["perception-distance"], params["eating-distance"], params["eating-number"],
 			params["max-time-steps"], params["n-food"]
 		)

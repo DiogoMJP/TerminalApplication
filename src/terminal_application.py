@@ -38,6 +38,7 @@ DEFAULT_PARAMS = {
 	"simulation-type"			: None,
 	"food-spawn-rate"			: 0.02,
 	"n-food"					: 6,
+	"poisonous-food-rate"		: 0.4,
 	"n-sensors"					: 5,
 	"fov"						: 160,
 	"n-freq"					: 2
@@ -45,7 +46,8 @@ DEFAULT_PARAMS = {
 
 SIMULATION_TYPES = [
 	"random-food-simulation",
-	"fixed-food-simulation"
+	"fixed-food-simulation",
+	"poisonous-food-simulation"
 ]
 
 CONFIGS = [
@@ -62,11 +64,11 @@ CONFIGS = [
 		"perception-processor-type" : "normalised-input-perception-processor"
 	}),
 	("05_eyes_implementation_config", {
-		"perception-processor-type" : "eyes-perception-processor",
+		"perception-processor-type" : "poisonous-eyes-perception-processor",
 		"perception-distance"		: 400
 	}),
 	("06_eyes_sound_implementation_config", {
-		"perception-processor-type"	: "eyes-sound-perception-processor",
+		"perception-processor-type"	: "poisonous-eyes-sound-perception-processor",
 		"agent-type"				: "sound-agent"
 	})
 ]

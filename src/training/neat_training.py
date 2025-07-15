@@ -135,4 +135,5 @@ class NeatTraining(Training):
 		if "n-sensors" in params: training.n_sensors = params["n-sensors"]
 		if "fov" in params: training.fov = params["fov"]
 		if "n-freq" in params: training.n_freq = params["n-freq"]
+		if "poisonous-food-rate" in params: training.poisonous_food_rate = params["poisonous-food-rate"]
 		return training

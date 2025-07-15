@@ -1,9 +1,13 @@
+from __future__	import annotations
+
 from src.agent			import Agent
 from src.agent.brain	import Brain
-from src.food			import Food
 
 from math	import cos, sin, radians
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+	from src.simulation	import Simulation
 
 
 class StoppedByWallsAgent(Agent):
@@ -19,16 +23,16 @@ class StoppedByWallsAgent(Agent):
 	def set_history(self, history: list[tuple[Any]], keys: list[str] = ["x", "y", "angle"]) -> None:
 		super().set_history(history, keys)
 
-	def simulate(self, time_step: int, food_list: list[Food], agent_list: list[Agent]) -> None:
+	def simulate(
+			self, time_step: int, simulation: Simulation, agent_list: list[Agent]
+		) -> None:
 		if self.alive:
 			if (time_step >= self.lifespan):
-				self.alive = False
-				self.last_time_step = time_step
-			
+				self.end_lifespan(time_step)
 			else:
 				l_rot, r_rot, speed = self.brain.get_action(
-					self.state, self.perception_distance, food_list,
-					agent_list, self.width, self.height
+					self.state, self.perception_distance, self.width, self.height,
+					agent_list=agent_list, food_list=simulation.food
 				)
 				change = -3 if l_rot else 3 if r_rot else 0
 				self.set_in_state("angle", self.get_from_state("angle") + change)
@@ -40,7 +44,7 @@ class StoppedByWallsAgent(Agent):
 					self.set_in_state("y",
 					   max(min(int(self.get_from_state("y") + sin(radians(self.get_from_state("angle")) * 4)), self.height - 1), 0)
 					)
-				food, dist = self.brain.get_closest_food(self.state, food_list)
+				food, dist = self.brain.get_closest_food(self.state, simulation.food)
 				if food != None and dist < self.eating_distance:
 					food.eaten_by += [self]
 			self.save_state()

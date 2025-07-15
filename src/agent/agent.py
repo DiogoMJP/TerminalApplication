@@ -36,6 +36,9 @@ class Agent(CreatableFromParameters):
 		return self.history[time_step][key]
 	def prolong_lifespan(self, time_step: int) -> None:
 		self.lifespan = time_step + self.lifespan_extension
+	def end_lifespan(self, time_step: int) -> None:
+		self.alive = False
+		self.last_time_step = time_step
 	
 	def set_history(self, history: list[tuple[Any]] , keys: list[str]) -> None:
 		for state in history:

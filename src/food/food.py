@@ -3,6 +3,7 @@ from __future__	import annotations
 from src.utils import CreatableFromParameters
 
 from abc	import abstractmethod
+from random	import random
 from typing	import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -12,14 +13,16 @@ if TYPE_CHECKING:
 class Food(CreatableFromParameters):
 	def __init__(
 		self, x: int, y: int, eating_number: int, first_time_step: int,
-		lifespan: int, detection_radius: int
+		lifespan: int, detection_radius: int, poisonous_food_rate: float
 ):
-		self.x					: int	= x
-		self.y					: int	= y
-		self.eating_number		: int	= eating_number
-		self.first_time_step	: int	= first_time_step
-		self.lifespan			: int	= lifespan
-		self.detection_radius	: int	= detection_radius
+		self.x						: int	= x
+		self.y						: int	= y
+		self.eating_number			: int	= eating_number
+		self.first_time_step		: int	= first_time_step
+		self.lifespan				: int	= lifespan
+		self.detection_radius		: int	= detection_radius
+		self.poisonous_food_rate	: float	= poisonous_food_rate
+		self.poisonous				: bool	= random() < poisonous_food_rate
 
 		self.eaten_by		: list[Agent]	= []
 		self.alive			: bool			= True

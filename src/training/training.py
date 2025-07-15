@@ -34,6 +34,7 @@ class Training(CreatableFromParameters):
 		self.simulation_type			: str				= simulation_type
 		self.food_spawn_rate			: Optional[float]	= None
 		self.n_food						: Optional[float]	= None
+		self.poisonous_food_rate		: Optional[float]	= None
 		self.brain						: Optional[Brain]	= None
 		self.n_sensors					: Optional[int]		= None
 		self.fov						: Optional[int]		= None
@@ -77,6 +78,8 @@ class Training(CreatableFromParameters):
 			params["food-spawn-rate"] = self.food_spawn_rate
 		if "n-food" in simulation_params and self.n_food != None:
 			params["n-food"] = self.n_food
+		if "poisonous-food-rate" in simulation_params and self.poisonous_food_rate != None:
+			params["poisonous-food-rate"] = self.poisonous_food_rate
 		return params
 	
 	def to_dict(self) -> dict[str, Any]:
@@ -99,6 +102,7 @@ class Training(CreatableFromParameters):
         }
 		if self.food_spawn_rate != None: data |= {"food-spawn-rate" : self.food_spawn_rate}
 		if self.n_food != None: data |= {"n-food" : self.n_food}
+		if self.poisonous_food_rate != None: data |= {"poisonous-food-rate" : self.poisonous_food_rate}
 		if self.brain != None: data |= {"brain" : self.brain.to_dict()}
 		if self.n_sensors != None: data |= {"n-sensors" : self.n_sensors}
 		if self.fov != None: data |= {"fov" : self.fov}

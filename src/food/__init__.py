@@ -1,5 +1,5 @@
-from src.food.food				import Food
-from src.food.default_food		import DefaultFood
+from src.food.food			import Food
+from src.food.default_food	import DefaultFood
 
 from typing import Any
 

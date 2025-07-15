@@ -28,8 +28,7 @@ class SoundAgent(Agent):
 		) -> None:
 		if self.alive:
 			if (time_step == self.lifespan):
-				self.alive = False
-				self.last_time_step = time_step
+				self.end_lifespan(time_step)
 			else:
 				l_rot, r_rot, speed, *sound = self.brain.get_action(
 					self.state, self.perception_distance, self.width, self.height,

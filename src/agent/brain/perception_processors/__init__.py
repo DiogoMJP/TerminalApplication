@@ -1,11 +1,13 @@
 from __future__	import annotations
 
-from src.agent.brain.perception_processors.perception_processor						import PerceptionProcessor
-from src.agent.brain.perception_processors.food_distance_perception_processor		import FoodDistancePerceptionProcessor
-from src.agent.brain.perception_processors.food_agent_distance_perception_processor	import FoodAgentDistancePerceptionProcessor
-from src.agent.brain.perception_processors.normalised_input_perception_processor	import NormalisedInputPerceptionProcessor
-from src.agent.brain.perception_processors.eyes_perception_processor				import EyesPerceptionProcessor
-from src.agent.brain.perception_processors.eyes_sound_perception_processor			import EyesSoundPerceptionProcessor
+from src.agent.brain.perception_processors.perception_processor							import PerceptionProcessor
+from src.agent.brain.perception_processors.food_distance_perception_processor			import FoodDistancePerceptionProcessor
+from src.agent.brain.perception_processors.food_agent_distance_perception_processor		import FoodAgentDistancePerceptionProcessor
+from src.agent.brain.perception_processors.normalised_input_perception_processor		import NormalisedInputPerceptionProcessor
+from src.agent.brain.perception_processors.eyes_perception_processor					import EyesPerceptionProcessor
+from src.agent.brain.perception_processors.eyes_sound_perception_processor				import EyesSoundPerceptionProcessor
+from src.agent.brain.perception_processors.poisonous_eyes_perception_processor			import PoisonousEyesPerceptionProcessor
+from src.agent.brain.perception_processors.poisonous_eyes_sound_perception_processor	import PoisonousEyesSoundPerceptionProcessor
 
 from typing	import Any, NotRequired, TypedDict, TYPE_CHECKING
 
@@ -34,6 +36,10 @@ def create_perception_processor(perception_processor_type: str, params: dict[str
 			return EyesPerceptionProcessor.create_from_parameters(params)
 		elif perception_processor_type == "eyes-sound-perception-processor":
 			return EyesSoundPerceptionProcessor.create_from_parameters(params)
+		elif perception_processor_type == "poisonous-eyes-perception-processor":
+			return PoisonousEyesPerceptionProcessor.create_from_parameters(params)
+		elif perception_processor_type == "poisonous-eyes-sound-perception-processor":
+			return PoisonousEyesSoundPerceptionProcessor.create_from_parameters(params)
 		else:
 			raise Exception(f"Invalid perception processor type: {perception_processor_type}")
 	except Exception as e: raise
@@ -49,6 +55,10 @@ def get_perception_processor_parameters(perception_processor_type: str) -> tuple
 		return EyesPerceptionProcessor.get_parameters()
 	elif perception_processor_type == "eyes-sound-perception-processor":
 		return EyesSoundPerceptionProcessor.get_parameters()
+	elif perception_processor_type == "poisonous-eyes-perception-processor":
+		return PoisonousEyesPerceptionProcessor.get_parameters()
+	elif perception_processor_type == "poisonous-eyes-sound-perception-processor":
+		return PoisonousEyesSoundPerceptionProcessor.get_parameters()
 	else:
 		raise Exception(f"Invalid perception processor type: {perception_processor_type}")
 
@@ -63,6 +73,10 @@ def load_perception_processor_from_data(data: dict[str, Any]) -> PerceptionProce
 		return EyesPerceptionProcessor.load_from_data(data)
 	elif data["type"] == "eyes-sound-perception-processor":
 		return EyesSoundPerceptionProcessor.load_from_data(data)
+	elif data["type"] == "poisonous-eyes-perception-processor":
+		return PoisonousEyesPerceptionProcessor.load_from_data(data)
+	elif data["type"] == "poisonous-eyes-sound-perception-processor":
+		return PoisonousEyesSoundPerceptionProcessor.load_from_data(data)
 	else:
 		raise Exception(f"Invalid perception processor type: {data['type']}")
 
@@ -72,5 +86,7 @@ def get_perception_processor_types() -> list[str]:
 		"food-agent-distance-perception-processor",
 		"normalised-input-perception-processor",
 		"eyes-perception-processor",
-		"eyes-sound-perception-processor"
+		"eyes-sound-perception-processor",
+		"poisonous-eyes-perception-processor",
+		"poisonous-eyes-sound-perception-processor"
 	]

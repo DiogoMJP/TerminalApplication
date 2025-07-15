@@ -15,9 +15,10 @@ class RandomFoodSimulation(Simulation):
 	):
 		super().__init__(
 			brain, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
-			food_type, food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps
+			food_type, food_lifespan, 0.0, perception_distance, eating_distance, eating_number, max_time_steps
 		)
 		self.food_spawn_rate	: float	= food_spawn_rate
+		
 		self.create_agents()
 		self.start_loop()
 	

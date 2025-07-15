@@ -6,9 +6,11 @@ from typing import Any
 class DefaultFood(Food):
 	def __init__(
 		self, x: int, y: int, eating_number: int, first_time_step: int,
-		lifespan: int, detection_radius: int
+		lifespan: int, detection_radius: int, poisonous_food_rate: float
 	):
-		super().__init__(x, y, eating_number, first_time_step, lifespan, detection_radius)
+		super().__init__(
+			x, y, eating_number, first_time_step, lifespan, detection_radius, poisonous_food_rate
+		)
 
 	def simulate(self, time_step: int) -> None:
 		if self.alive:
@@ -16,7 +18,10 @@ class DefaultFood(Food):
 				if len(self.eaten_by) >= self.eating_number:
 					self.eaten = True
 					for agent in self.eaten_by:
-						agent.prolong_lifespan(time_step)
+						if self.poisonous:
+							agent.end_lifespan(time_step)
+						else:
+							agent.prolong_lifespan(time_step)
 				self.alive = False
 				self.last_time_step = time_step
 			self.eaten_by = []
@@ -33,7 +38,7 @@ class DefaultFood(Food):
 	def get_parameters() -> tuple[tuple[str, type], ...]:
 		return (
 			("x", int), ("y", int), ("eating-number", int), ("first-time-step", int),
-			("food-lifespan", int), ("perception-distance", int)
+			("food-lifespan", int), ("perception-distance", int), ("poisonous-food-rate", float)
 		)
 	
 	@staticmethod
@@ -47,5 +52,5 @@ class DefaultFood(Food):
 				)
 		return DefaultFood(
 			params["x"], params["y"], params["eating-number"], params["first-time-step"],
-			params["food-lifespan"], params["perception-distance"]
+			params["food-lifespan"], params["perception-distance"], params["poisonous-food-rate"]
 		)
