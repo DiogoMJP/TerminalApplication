@@ -120,9 +120,13 @@ class NeatTrainingReplay(TrainingReplay):
 		)
 		if "food-spawn-rate" in data: training_replay.food_spawn_rate = data["food-spawn-rate"]
 		if "n-food" in data: training_replay.n_food = data["n-food"]
-		if "brain" in data: training_replay.brain = load_brain_from_data(data["brain"])
-		if "n-sensors" in data: training_replay.n_sensors = data["n-sensors"]
+		if "poisonous-food-rate" in data: training_replay.poisonous_food_rate = data["poisonous-food-rate"]
+		if "normalized" in data: training_replay.normalized = data["normalized"]
+		if "n-cones" in data: training_replay.n_cones = data["n-cones"]
 		if "fov" in data: training_replay.fov = data["fov"]
+		if "see-agents" in data: training_replay.see_agents = data["see-agents"]
+		if "see-food" in data: training_replay.see_food = data["see-food"]
+		if "see-poisonous-food" in data: training_replay.see_poisonous_food = data["see-poisonous-food"]
+		if "see-walls" in data: training_replay.see_walls = data["see-walls"]
 		if "n-freq" in data: training_replay.n_freq = data["n-freq"]
-
 		return training_replay

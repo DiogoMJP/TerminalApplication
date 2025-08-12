@@ -40,9 +40,15 @@ class TrainingReplay(Loadable):
 		self.max_performance			: int				= max_performance
 		self.food_spawn_rate			: Optional[float]	= None
 		self.n_food						: Optional[float]	= None
+		self.poisonous_food_rate		: Optional[float]	= None
 		self.brain						: Optional[Brain]	= None
-		self.n_sensors					: Optional[int]		= None
+		self.n_cones					: Optional[int]		= None
+		self.normalized					: Optional[bool]	= None
 		self.fov						: Optional[int]		= None
+		self.see_agents					: Optional[bool]	= None
+		self.see_food					: Optional[bool]	= None
+		self.see_poisonous_food			: Optional[bool]	= None
+		self.see_walls					: Optional[bool]	= None
 		self.n_freq						: Optional[int]		= None
 	
 	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:

@@ -6,11 +6,15 @@ from typing			import Any
 
 
 class NeatNeuralNetwork(NeuralNetwork):
-	def __init__(self, inputs, outputs, node_evals):
-		self.inputs = inputs
-		self.outputs = outputs
-		self.node_evals = node_evals
-		self.values = dict((key, 0.0) for key in inputs + outputs)
+	def __init__(
+		self, inputs: list[int], outputs: list[int],
+		node_evals: list[tuple[int, float, float, list[tuple[int, float]]]]
+	):
+		self.inputs		: list[int]													= inputs
+		self.outputs	: list[int]													= outputs
+		self.node_evals	: list[tuple[int, float, float, list[tuple[int, float]]]]	= node_evals
+		
+		self.values	: dict[int, float]	= dict((key, 0.0) for key in inputs + outputs)
 
 	def sum(self, lst: list[float]) -> float:
 		return sum(lst)

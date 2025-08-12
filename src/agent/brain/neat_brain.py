@@ -4,12 +4,13 @@ from src.agent.brain						import Brain
 from src.agent.brain.neural_network			import NeatNeuralNetwork, create_neural_network
 from src.agent.brain.perception_processors	import create_perception_processor, load_perception_processor_from_data
 
-from neat.nn			import FeedForwardNetwork
-from typing				import Any, Unpack, TYPE_CHECKING
+from neat.nn								import FeedForwardNetwork
+from src.agent.brain.perception_processors	import PerceptionProcessor
+from typing									import Any, Unpack, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from src.agent.brain.neural_network			import NeuralNetwork
-	from src.agent.brain.perception_processors	import EnvironmentData, PerceptionProcessor
+	from src.agent.brain.perception_processors	import EnvironmentData
 
 
 class NeatBrain(Brain):
@@ -23,11 +24,13 @@ class NeatBrain(Brain):
 		return len(self.neat_net.node_evals) + len(self.neat_net.inputs)
 	
 	def get_action(
-		self, state: dict[str, Any], perception_distance: int, width: int, height: int,
+		self, state: dict[str, Any], perception_distance: int,
+		poisonous_perception_distance: int, width: int, height: int,
 		**environment_data: Unpack[EnvironmentData]
 	) -> tuple[int, ...]:
 		input = self.get_perception(
-			state, perception_distance, width, height, **environment_data
+			state, perception_distance, poisonous_perception_distance,
+			width, height, **environment_data
 		)
 		
 		output = self.neat_net.activate(input)
@@ -50,7 +53,7 @@ class NeatBrain(Brain):
 	
 	@staticmethod
 	def get_parameters() -> tuple[tuple[str, type], ...]:
-		return (("neat-neural-network", FeedForwardNetwork), ("perception-processor-type", str))
+		return (("neat-neural-network", FeedForwardNetwork), ("perception-processor", PerceptionProcessor))
 	
 	@staticmethod
 	def create_from_parameters(params: dict[str, Any]) -> 'NeatBrain':
@@ -63,6 +66,5 @@ class NeatBrain(Brain):
 				)
 		try:
 			neural_network = create_neural_network("neat-neural-network", params)
-			perception_processor = create_perception_processor(params["perception-processor-type"], params)
 		except Exception as e: raise
-		return NeatBrain(neural_network, perception_processor)
+		return NeatBrain(neural_network, params["perception-processor"])

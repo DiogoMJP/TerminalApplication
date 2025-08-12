@@ -19,63 +19,6 @@ if TYPE_CHECKING:
 	from src.training.replay	import GraphData
 
 
-DEFAULT_PARAMS = {
-	"n-generations"				: 25,
-	"width"						: 1000,
-	"height"					: 1000,
-	"n-agents"					: 15,
-	"agent-type"				: "default-agent",
-	"agents-lifespan"			: 350,
-	"agents-lifespan-extension"	: 350,
-	"food-type"					: "default-food",
-	"food-lifespan"				: 350,
-	"perception-distance"		: 200,
-	"eating-distance"			: 15,
-	"eating-number"				: None,
-	"max-time-steps"			: 3500,
-	"config-file"				: None,
-	"perception-processor-type"	: None,
-	"simulation-type"			: None,
-	"food-spawn-rate"			: 0.02,
-	"n-food"					: 6,
-	"poisonous-food-rate"		: 0.4,
-	"n-sensors"					: 5,
-	"fov"						: 160,
-	"n-freq"					: 2
-}
-
-SIMULATION_TYPES = [
-	"random-food-simulation",
-	"fixed-food-simulation",
-	"poisonous-food-simulation"
-]
-
-CONFIGS = [
-	("01_starting_config", {
-		"perception-processor-type" : "food-agent-distance-perception-processor"
-	}),
-	("02_weight_range_change_config", {
-		"perception-processor-type" : "food-agent-distance-perception-processor"
-	}),
-	("03_weight_params_change_config", {
-		"perception-processor-type" : "food-agent-distance-perception-processor"
-	}),
-	("04_normalise_input_config", {
-		"perception-processor-type" : "normalised-input-perception-processor"
-	}),
-	("05_eyes_implementation_config", {
-		"perception-processor-type" : "poisonous-eyes-perception-processor",
-		"perception-distance"		: 400
-	}),
-	("06_eyes_sound_implementation_config", {
-		"perception-processor-type"	: "poisonous-eyes-sound-perception-processor",
-		"agent-type"				: "sound-agent"
-	})
-]
-
-EATING_NUMBERS = [1, 2, 3]
-
-
 def remove_directory_tree(start_directory: Path) -> None:
 	if not start_directory.exists(): return
 	for path in start_directory.iterdir():
@@ -93,43 +36,50 @@ def wrap_labels(ax, labels, width, break_long_words=False):
 class TerminalApplication(object):
 	def __init__(self):
 		# remove_directory_tree(Path("saved_data"))
-		self.params				: dict[str, Any]					= dict(DEFAULT_PARAMS)
-		self.simulation_types	: list[str]							= list(SIMULATION_TYPES)
-		self.config_files		: list[tuple[str, dict[str, Any]]]	= [
-			(config[0], dict(config[1])) for config in CONFIGS
-		]
-		self.eating_numbers		: list[int]							= list(EATING_NUMBERS)
+		with open("saved_parameters/running_params.json", "r") as fp:
+			data = json.load(fp)
+		self.default_params	: dict[str, Any]			= data["default-params"]
+		self.params			: dict[str, Any]			= dict(self.default_params)
+		self.trainings		: dict[str, dict[str, Any]]	= data["trainings"]
+		self.configs		: dict[str, dict[str, Any]]	= data["configs"]
+		self.eating_numbers	: list[int]					= data["eating-numbers"]
 
 	def main(self) -> None:
-		for simulation_type in self.simulation_types:
-			for config_file, params in self.config_files:
-				for key, val in params.items():
+		for training_type, train_params in self.trainings.items():
+			for config_name, conf_params in self.configs.items():
+
+				self.params = dict(self.default_params)
+				for key, val in train_params.items():
 					if key not in self.params.keys():
 						raise Exception(f"{self.__class__.__name__}: Invalid parameter: {key}")
 					else: self.params[key] = val
+				for key, val in conf_params.items():
+					if key not in self.params.keys():
+						raise Exception(f"{self.__class__.__name__}: Invalid parameter: {key}")
+					else: self.params[key] = val
+
 				for eating_number in self.eating_numbers:
 					for id in range(10):
-						self.train(simulation_type, config_file, eating_number, id)
-					self.create_graphs_from_training_data(simulation_type, config_file, eating_number)
-			self.generate_average_performance_graph(simulation_type)
+						self.train(training_type, config_name, eating_number, id)
+					self.create_graphs_from_training_data(training_type, config_name, eating_number)
+			self.generate_average_performance_graph(training_type)
+
 		print()
 		print("Training completed.")
 	
-	def train(self, simulation_type: str, config_file: str, eating_number: int, id: int) -> None:
+	def train(self, training_type: str, config_file: str, eating_number: int, id: int) -> None:
 		print()
-		self.params["simulation-type"] = simulation_type
-		self.params["config-file"] = f"config_files/{config_file}"
 		self.params["eating-number"] = eating_number
-		print(f"Running simulation {simulation_type} with config {config_file}, eating number {eating_number}, and id {id} and configs {self.params}")
+		print(f"Running training {training_type} with config {config_file}, eating number {eating_number}, and id {id} and configs {self.params}")
 		start = time()
 		training = create_training("neat-training", self.params)
 		training.start_training()
 		end = time()
 		print(f"Training took {end - start:.2f} seconds")
 		average_performance, max_performance = self.get_training_result_performance(training)
-		Path(f"saved_data/{simulation_type}/{config_file}/{eating_number}").mkdir(parents=True, exist_ok=True)
-		Path(f"saved_data/{simulation_type}/{config_file}/{eating_number}/{id}.json").unlink(missing_ok=True)
-		with open(f"saved_data/{simulation_type}/{config_file}/{eating_number}/{id}.json", "w+") as fp:
+		Path(f"saved_data/{training_type}/{config_file}/{eating_number}").mkdir(parents=True, exist_ok=True)
+		Path(f"saved_data/{training_type}/{config_file}/{eating_number}/{id}.json").unlink(missing_ok=True)
+		with open(f"saved_data/{training_type}/{config_file}/{eating_number}/{id}.json", "w+") as fp:
 			json.dump(training.to_dict() | {
 				"duration" : end - start,
 				"average-performance" : average_performance,
@@ -166,13 +116,13 @@ class TerminalApplication(object):
 					training_replay = load_training_replay_from_data(json.load(fp))
 				training_replay.create_graphs(f"{start_path}/{config.stem}")
 	
-	def generate_average_performance_graph(self, simulation_type: str) -> None:
-		with open(f"saved_data/{simulation_type}/performance.json", "r") as fp:
+	def generate_average_performance_graph(self, training_type: str) -> None:
+		with open(f"saved_data/{training_type}/performance.json", "r") as fp:
 			vals: dict[str, dict[str, dict[str, list[float]]]]= json.load(fp)
-		vals = {" ".join(key.split("_")[1:]): val for key, val in vals.items()}
+		vals = {" ".join(key.split(" ")[1:]): val for key, val in vals.items()}
 		agents = tuple(vals[list(vals.keys())[0]].keys())
 		print()
-		print(f"Simulation {simulation_type} average performance: {vals}")
+		print(f"Training {training_type} average performance: {vals}")
 		fig, ax = plt.subplots(layout="constrained")
 		for i in agents:
 			x_vals = list(vals.keys())
@@ -194,11 +144,11 @@ class TerminalApplication(object):
 			)
 		wrap_labels(ax, list(vals.keys()), 15)
 		ax.legend()
-		plt.xlabel("Configuration Files")
+		plt.xlabel("Configurations")
 		plt.ylabel("Average Duration (time steps)")
 		fig.suptitle("Average agent performance")
-		Path(f"saved_data/{simulation_type}/average_performance.png").unlink(missing_ok=True)
-		fig.savefig(f"saved_data/{simulation_type}/average_performance.png")
+		Path(f"saved_data/{training_type}/average_performance.png").unlink(missing_ok=True)
+		fig.savefig(f"saved_data/{training_type}/average_performance.png")
 		plt.close('all')
 
 	def join_graph_data(self, data_list: list[GraphData]) -> GraphData:
@@ -225,13 +175,13 @@ class TerminalApplication(object):
 		plt.savefig(path + f"/{data['filename']}.png")
 		plt.close('all')
 
-	def create_graphs_from_training_data(self, simulation_type: str, config_file: str, eating_number: int) -> None:
+	def create_graphs_from_training_data(self, training_type: str, config_file: str, eating_number: int) -> None:
 		print()
-		print(f"Generating graphs for training {simulation_type} with config {config_file} and eating number {eating_number}")
+		print(f"Generating graphs for training {training_type} with config {config_file} and eating number {eating_number}")
 		data_lists = []
 		average_performance = []
 		max_performance = []
-		for path in Path(f"saved_data/{simulation_type}/{config_file}/{eating_number}").iterdir():
+		for path in Path(f"saved_data/{training_type}/{config_file}/{eating_number}").iterdir():
 			if path.is_file() and path.suffix == ".json":
 				with open(path, "r") as fp:
 					training_replay = load_training_replay_from_data(json.load(fp))
@@ -245,8 +195,8 @@ class TerminalApplication(object):
 				max_performance += [training_replay.max_performance]
 		data_lists = [self.join_graph_data(data_list) for data_list in data_lists]
 		for graph_data in data_lists:
-			self.create_graph(graph_data, f"saved_data/{simulation_type}/{config_file}/{eating_number}")
-		sim_type_performance_path = Path(f"saved_data/{simulation_type}/performance.json")
+			self.create_graph(graph_data, f"saved_data/{training_type}/{config_file}/{eating_number}")
+		sim_type_performance_path = Path(f"saved_data/{training_type}/performance.json")
 		if sim_type_performance_path.exists():
 			with open(sim_type_performance_path, "r") as fp:
 				sim_type_performance = json.load(fp)

@@ -12,12 +12,13 @@ class PoisonousFoodSimulation(Simulation):
 	def __init__(
 		self, brain : Brain, width: int, height: int, n_agents: int, agent_type: str, agents_lifespan: int,
 		agents_lifespan_extension: int, food_type: str, food_lifespan: int, poisonous_food_rate: float,
-		perception_distance: int, eating_distance: int, eating_number: int, max_time_steps: int, n_food: int
+		poisonous_perception_distance: int, perception_distance: int, eating_distance: int,
+		eating_number: int, max_time_steps: int, n_food: int
 	):
 		super().__init__(
 			brain, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
-			food_type, food_lifespan, poisonous_food_rate, perception_distance, eating_distance,
-			eating_number, max_time_steps
+			food_type, food_lifespan, poisonous_food_rate, poisonous_perception_distance, perception_distance,
+			eating_distance, eating_number, max_time_steps
 		)
 		self.n_food					: int	= n_food
 
@@ -67,8 +68,8 @@ class PoisonousFoodSimulation(Simulation):
 		return (
 			("brain", Brain), ("width", int), ("height", int), ("n-agents", int), ("agent-type", str),
 			("agents-lifespan", int), ("agents-lifespan-extension", int), ("food-type", str), ("food-lifespan", int),
-			("poisonous-food-rate", float), ("perception-distance", int), ("eating-distance", int),
-			("eating-number", int), ("max-time-steps", int), ("n-food", int)
+			("poisonous-food-rate", float), ("poisonous-perception-distance", int), ("perception-distance", int),
+			("eating-distance", int), ("eating-number", int), ("max-time-steps", int), ("n-food", int)
 		)
 	
 	@staticmethod
@@ -83,6 +84,6 @@ class PoisonousFoodSimulation(Simulation):
 		return PoisonousFoodSimulation(
 			params["brain"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-type"], params["food-lifespan"],
-			params["poisonous-food-rate"], params["perception-distance"], params["eating-distance"], params["eating-number"],
-			params["max-time-steps"], params["n-food"]
+			params["poisonous-food-rate"], params["poisonous-perception-distance"], params["perception-distance"],
+			params["eating-distance"], params["eating-number"], params["max-time-steps"], params["n-food"]
 		)

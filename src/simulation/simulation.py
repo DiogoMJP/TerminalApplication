@@ -20,23 +20,24 @@ class Simulation(CreatableFromParameters):
 	def __init__(
 		self, brain : Brain, width: int, height: int, n_agents: int, agent_type: str, agents_lifespan: int,
 		agents_lifespan_extension: int, food_type: str, food_lifespan: int, poisonous_food_rate: float,
-		perception_distance: int, eating_distance: int,
+		poisonous_perception_distance: int, perception_distance: int, eating_distance: int,
 		eating_number: int, max_time_steps: int
 	):
-		self.brain						: Brain	= brain
-		self.width						: int	= width
-		self.height						: int	= height
-		self.n_agents					: int	= n_agents
-		self.agent_type					: str	= agent_type
-		self.agents_lifespan			: int	= agents_lifespan
-		self.agents_lifespan_extension	: int	= agents_lifespan_extension
-		self.food_type					: str	= food_type
-		self.food_lifespan				: int	= food_lifespan
-		self.poisonous_food_rate		: float	= poisonous_food_rate
-		self.perception_distance		: int	= perception_distance
-		self.eating_distance			: int	= eating_distance
-		self.eating_number				: int	= eating_number
-		self.max_time_steps				: int	= max_time_steps
+		self.brain							: Brain	= brain
+		self.width							: int	= width
+		self.height							: int	= height
+		self.n_agents						: int	= n_agents
+		self.agent_type						: str	= agent_type
+		self.agents_lifespan				: int	= agents_lifespan
+		self.agents_lifespan_extension		: int	= agents_lifespan_extension
+		self.food_type						: str	= food_type
+		self.food_lifespan					: int	= food_lifespan
+		self.poisonous_food_rate			: float	= poisonous_food_rate
+		self.perception_distance			: int	= perception_distance
+		self.poisonous_perception_distance	: int	= poisonous_perception_distance
+		self.eating_distance				: int	= eating_distance
+		self.eating_number					: int	= eating_number
+		self.max_time_steps					: int	= max_time_steps
 		
 		self.last_time_step		: int				= 0
 		self.finished			: bool				= False
@@ -93,6 +94,8 @@ class Simulation(CreatableFromParameters):
 			params["agents-lifespan-extension"] = self.agents_lifespan_extension
 		if "perception-distance" in agent_params:
 			params["perception-distance"] = self.perception_distance
+		if "poisonous-perception-distance" in agent_params:
+			params["poisonous-perception-distance"] = self.poisonous_perception_distance
 		if "eating-distance" in agent_params:
 			params["eating-distance"] = self.eating_distance
 		return params
@@ -112,6 +115,8 @@ class Simulation(CreatableFromParameters):
 			params["food-lifespan"] = self.food_lifespan
 		if "perception-distance" in food_params:
 			params["perception-distance"] = self.perception_distance
+		if "poisonous-perception-distance" in food_params:
+			params["poisonous-perception-distance"] = self.poisonous_perception_distance
 		if "poisonous-food-rate" in food_params:
 			params["poisonous-food-rate"] = self.poisonous_food_rate
 		return params

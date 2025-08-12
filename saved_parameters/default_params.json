@@ -1,0 +1,87 @@
+{
+	"default-params" : {
+		"n-generations"					: 25,
+		"width"							: 1000,
+		"height"						: 1000,
+		"n-agents"						: 15,
+		"agent-type"					: "default-agent",
+		"agents-lifespan"				: 350,
+		"agents-lifespan-extension"		: 350,
+		"food-type"						: "default-food",
+		"food-lifespan"					: 350,
+		"perception-distance"			: 200,
+		"poisonous-perception-distance"	: 100,
+		"eating-distance"				: 15,
+		"eating-number"					: 1,
+		"max-time-steps"				: 5000,
+		"config-file"					: "01_starting_config",
+		"simulation-type"				: "random-food-simulation",
+		"perception-processor-type"		: "default-perception-processor",
+		"food-spawn-rate"				: 0.02,
+		"n-food"						: 6,
+		"poisonous-food-rate"			: 0.0,
+		"perception-nodes"				: ["angle-distance-perception-node"],
+		"normalized"					: false,
+		"n-cones"						: 5,
+		"fov"							: 160,
+		"see-agents"					: true,
+		"see-food"						: true,
+		"see-poisonous-food"			: false,
+		"see-walls"						: false,
+		"n-freq"						: 2
+	},
+	"trainings" : {
+		"random_food"		: {
+			"simulation-type"	: "random-food-simulation"
+		},
+		"fixed_food"		: {
+			"simulation-type"	: "fixed-food-simulation"
+		},
+		"poisonous_food"	: {
+			"poisonous-food-rate"	: 0.4,
+			"simulation-type"		: "poisonous-food-simulation",
+			"see-poisonous-food"	: true
+		}
+	},
+	"configs" : {
+		"01 Starting"					: {
+			"config-file"		: "config_files/01_starting_config",
+			"perception-nodes"	: ["angle-distance-perception-node"]
+		},
+		"02 Weight Range Change"		: {
+			"config-file"		: "config_files/02_weight_range_change_config",
+			"perception-nodes"	: ["angle-distance-perception-node"]
+		},
+		"03 Weight Params Change"		: {
+			"config-file"		: "config_files/03_weight_params_change_config",
+			"perception-nodes"	: ["angle-distance-perception-node"]
+		},
+		"04 Normalized Input"			: {
+			"config-file"		: "config_files/03_weight_params_change_config",
+			"perception-nodes"	: ["angle-distance-perception-node"],
+			"normalized"		: true
+		},
+		"05 Eyes"						: {
+			"config-file"			: "config_files/03_weight_params_change_config",
+			"perception-nodes"		: ["eyes-perception-node"],
+			"normalized"			: true,
+			"perception-distance"	: 400
+		},
+		"06 Angle-Distance and Sound"	: {
+			"config-file"		: "config_files/03_weight_params_change_config",
+			"perception-nodes"	: ["angle-distance-perception-node", "sound-perception-node"],
+			"normalized"		: true,
+			"n-freq"			: 2,
+			"agent-type"		: "sound-agent"
+		},
+		"07 Eyes and Sound"			: {
+			"config-file"			: "config_files/03_weight_params_change_config",
+			"perception-nodes"		: ["eyes-perception-node", "sound-perception-node"],
+			"normalized"			: true,
+			"perception-distance"	: 400,
+			"n-freq"				: 2,
+			"agent-type"			: "sound-agent"
+		}
+	},
+	"eating-numbers" : [1, 2, 3]
+}

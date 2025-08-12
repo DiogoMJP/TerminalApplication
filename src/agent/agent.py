@@ -13,16 +13,18 @@ if TYPE_CHECKING:
 class Agent(CreatableFromParameters):
 	def __init__(
 		self, brain: Brain, width: int, height: int, lifespan: int, lifespan_extension: int,
-		perception_distance: int, eating_distance: int, state: dict[str, Any]
+		perception_distance: int, poisonous_perception_distance: int,eating_distance: int,
+		state: dict[str, Any]
 	):
-		self.brain					: Brain				= brain
-		self.width					: int				= width
-		self.height					: int				= height
-		self.lifespan				: int				= lifespan
-		self.lifespan_extension		: int				= lifespan_extension
-		self.perception_distance	: int				= perception_distance
-		self.eating_distance		: int				= eating_distance
-		self.state					: dict[str, Any]	= state
+		self.brain							: Brain				= brain
+		self.width							: int				= width
+		self.height							: int				= height
+		self.lifespan						: int				= lifespan
+		self.lifespan_extension				: int				= lifespan_extension
+		self.perception_distance			: int				= perception_distance
+		self.poisonous_perception_distance	: int				= poisonous_perception_distance
+		self.eating_distance				: int				= eating_distance
+		self.state							: dict[str, Any]	= state
 
 		self.last_time_step	: int					= 0
 		self.history		: list[dict[str, Any]]	= []

@@ -13,11 +13,11 @@ if TYPE_CHECKING:
 class DefaultAgent(Agent):
 	def __init__(
 			self, brain: Brain, width: int, height: int, lifespan: int, lifespan_extension: int,
-			perception_distance: int, eating_distance: int
+			perception_distance: int, poisonous_perception_distance: int, eating_distance: int
 		):
 		super().__init__(
 			brain, width, height, lifespan, lifespan_extension, perception_distance,
-			eating_distance, {"x": None, "y": None, "angle": None}
+			poisonous_perception_distance, eating_distance, {"x": None, "y": None, "angle": None}
 		)
 
 	def set_history(self, history: list[tuple[Any]], keys: list[str] = ["x", "y", "angle"]) -> None:
@@ -31,8 +31,8 @@ class DefaultAgent(Agent):
 				self.end_lifespan(time_step)
 			else:
 				l_rot, r_rot, speed = self.brain.get_action(
-					self.state, self.perception_distance, self.width, self.height,
-					agent_list=agent_list, food_list=simulation.food
+					self.state, self.perception_distance, self.poisonous_perception_distance,
+					self.width, self.height, agent_list=agent_list, food_list=simulation.food
 				)
 				change = -3 if l_rot else 3 if r_rot else 0
 				self.set_in_state("angle", self.get_from_state("angle") + change)
@@ -60,7 +60,8 @@ class DefaultAgent(Agent):
 	def get_parameters() -> tuple[tuple[str, type], ...]:
 		return (
 			("brain", Brain), ("width", int), ("height", int), ("agents-lifespan", int),
-			("agents-lifespan-extension", int), ("perception-distance", int), ("eating-distance", int)
+			("agents-lifespan-extension", int), ("perception-distance", int),
+			("poisonous-perception-distance", int), ("eating-distance", int)
 		)
 	
 	@staticmethod
@@ -74,5 +75,6 @@ class DefaultAgent(Agent):
 				)
 		return DefaultAgent(
 			params["brain"], params["width"], params["height"], params["agents-lifespan"],
-			params["agents-lifespan-extension"], params["perception-distance"], params["eating-distance"]
+			params["agents-lifespan-extension"], params["perception-distance"],
+			params["poisonous-perception-distance"], params["eating-distance"]
 		)

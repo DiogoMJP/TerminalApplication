@@ -10,12 +10,13 @@ from typing import Any
 class RandomFoodSimulation(Simulation):
 	def __init__(
 		self, brain : Brain, width: int, height: int, n_agents: int, agent_type: str, agents_lifespan: int,
-		agents_lifespan_extension: int, food_type: str, food_lifespan: int, perception_distance: int, eating_distance: int,
-		eating_number: int, max_time_steps: int, food_spawn_rate: float
+		agents_lifespan_extension: int, food_type: str, food_lifespan: int, perception_distance: int,
+		eating_distance: int, eating_number: int, max_time_steps: int, food_spawn_rate: float
 	):
 		super().__init__(
 			brain, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
-			food_type, food_lifespan, 0.0, perception_distance, eating_distance, eating_number, max_time_steps
+			food_type, food_lifespan, 0.0, 0, perception_distance, eating_distance, eating_number,
+			max_time_steps
 		)
 		self.food_spawn_rate	: float	= food_spawn_rate
 		
@@ -77,6 +78,6 @@ class RandomFoodSimulation(Simulation):
 		return RandomFoodSimulation(
 			params["brain"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-type"], params["food-lifespan"],
-			params["perception-distance"], params["eating-distance"], params["eating-number"],
-			params["max-time-steps"], params["food-spawn-rate"]
+			params["perception-distance"], params["eating-distance"], params["eating-number"], params["max-time-steps"],
+			params["food-spawn-rate"]
 		)

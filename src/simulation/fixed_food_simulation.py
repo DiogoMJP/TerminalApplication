@@ -15,7 +15,8 @@ class FixedFoodSimulation(Simulation):
 	):
 		super().__init__(
 			brain, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
-			food_type, food_lifespan, 0.0, perception_distance, eating_distance, eating_number, max_time_steps
+			food_type, food_lifespan, 0.0, 0, perception_distance, eating_distance, eating_number,
+			max_time_steps
 		)
 		self.n_food	: int	= n_food
 		
@@ -81,6 +82,6 @@ class FixedFoodSimulation(Simulation):
 		return FixedFoodSimulation(
 			params["brain"], params["width"], params["height"], params["n-agents"], params["agent-type"],
 			params["agents-lifespan"], params["agents-lifespan-extension"], params["food-type"], params["food-lifespan"],
-			params["perception-distance"], params["eating-distance"], params["eating-number"],
-			params["max-time-steps"], params["n-food"]
+			params["perception-distance"], params["eating-distance"], params["eating-number"], params["max-time-steps"],
+			params["n-food"]
 		)

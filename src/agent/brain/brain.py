@@ -19,11 +19,13 @@ class Brain(CreatableFromParameters, Loadable):
 		return self.perception_processor.get_closest_food(state, food_list)
 
 	def get_perception(
-		self, state: dict[str, Any], perception_distance: int, width: int, height: int,
+		self, state: dict[str, Any], perception_distance: int,
+		poisonous_perception_distance: int, width: int, height: int,
 		**environment_data: Unpack[EnvironmentData]
 	) -> tuple[float, ...]:
 		return self.perception_processor.process_input(
-			state, perception_distance, width, height, **environment_data
+			state, perception_distance, poisonous_perception_distance,
+			width, height, **environment_data
 		)
 
 	@abstractmethod
@@ -32,7 +34,8 @@ class Brain(CreatableFromParameters, Loadable):
 
 	@abstractmethod
 	def get_action(
-		self, state: dict[str, Any], perception_distance: int, width: int, height: int,
+		self, state: dict[str, Any], perception_distance: int,
+		poisonous_perception_distance: int, width: int, height: int,
 		**environment_data: Unpack[EnvironmentData]
 	) -> tuple[int, ...]:
 		raise NotImplementedError(f"{self.__class__.__name__}: get_action method must be implemented in subclasses")
