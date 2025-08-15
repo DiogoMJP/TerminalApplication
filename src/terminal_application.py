@@ -36,13 +36,12 @@ def wrap_labels(ax, labels, width, break_long_words=False):
 class TerminalApplication(object):
 	def __init__(self):
 		# remove_directory_tree(Path("saved_data"))
-		with open("saved_parameters/running_params.json", "r") as fp:
+		with open("saved_parameters/default_params.json", "r") as fp:
 			data = json.load(fp)
 		self.default_params	: dict[str, Any]			= data["default-params"]
 		self.params			: dict[str, Any]			= dict(self.default_params)
 		self.trainings		: dict[str, dict[str, Any]]	= data["trainings"]
 		self.configs		: dict[str, dict[str, Any]]	= data["configs"]
-		self.eating_numbers	: list[int]					= data["eating-numbers"]
 
 	def main(self) -> None:
 		for training_type, train_params in self.trainings.items():
@@ -58,7 +57,7 @@ class TerminalApplication(object):
 						raise Exception(f"{self.__class__.__name__}: Invalid parameter: {key}")
 					else: self.params[key] = val
 
-				for eating_number in self.eating_numbers:
+				for eating_number in self.params["eating-numbers"]:
 					for id in range(10):
 						self.train(training_type, config_name, eating_number, id)
 					self.create_graphs_from_training_data(training_type, config_name, eating_number)
