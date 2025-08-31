@@ -28,12 +28,12 @@ class NeatBrain(Brain):
 		poisonous_perception_distance: int, width: int, height: int,
 		**environment_data: Unpack[EnvironmentData]
 	) -> tuple[int, ...]:
-		input = self.get_perception(
+		perception = self.get_perception(
 			state, perception_distance, poisonous_perception_distance,
 			width, height, **environment_data
 		)
 		
-		output = self.neat_net.activate(input)
+		output = self.neat_net.activate(perception)
 		
 		return tuple(1 if val >= 0.5 else 0 for val in output)
 

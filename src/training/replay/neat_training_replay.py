@@ -14,16 +14,16 @@ if TYPE_CHECKING:
 class NeatTrainingReplay(TrainingReplay):
 	def __init__(
 		self, n_generations: int, width: int, height: int, n_agents: int, agent_type: str,
-		agents_lifespan: int, agents_lifespan_extension: int, food_lifespan: int,
+		agents_lifespan: int, agents_lifespan_extension: int, food_type: str, food_lifespan: int,
 		perception_distance: int, eating_distance: int, eating_number: int, max_time_steps: int,
-		perception_processor_type: str, simulation_type: str, config_file: str, config_params: dict[str, Any],
+		perception_processor_type: str, simulation_type: str,perception_nodes: list[str], config_file: str, config_params: dict[str, Any],
 		simulations: dict[str, dict[str, dict[str, Any]]], duration: float, average_performance: float,
 		max_performance: int
 	):
 		super().__init__(
 			n_generations, width, height, n_agents, agent_type, agents_lifespan, agents_lifespan_extension,
-			food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps, 
-			perception_processor_type, simulation_type, duration, average_performance, max_performance
+			food_type, food_lifespan, perception_distance, eating_distance, eating_number, max_time_steps, 
+			perception_processor_type, simulation_type, perception_nodes, duration, average_performance, max_performance
 		)
 		self.config_file				: str	= config_file
 		self.config_params				: dict[str, Any]							= config_params
@@ -113,14 +113,17 @@ class NeatTrainingReplay(TrainingReplay):
 	def load_from_data(data: dict[str, Any]) -> 'NeatTrainingReplay':
 		training_replay = NeatTrainingReplay(
 			data["n-generations"], data["width"], data["height"], data["n-agents"], data["agent-type"],
-			data["agents-lifespan"], data["agents-lifespan-extension"], data["food-lifespan"],
+			data["agents-lifespan"], data["agents-lifespan-extension"], data["food-type"], data["food-lifespan"],
 			data["perception-distance"], data["eating-distance"], data["eating-number"], data["max-time-steps"],
-			data["perception-processor-type"], data["simulation-type"], data["config-file"], data["config-params"],
-			data["simulations"], data["duration"], data["average-performance"], data["max-performance"]
+			data["perception-processor-type"], data["simulation-type"], data["perception-nodes"], data["config-file"],
+			data["config-params"], data["simulations"], data["duration"], data["average-performance"],
+			data["max-performance"]
 		)
 		if "food-spawn-rate" in data: training_replay.food_spawn_rate = data["food-spawn-rate"]
 		if "n-food" in data: training_replay.n_food = data["n-food"]
 		if "poisonous-food-rate" in data: training_replay.poisonous_food_rate = data["poisonous-food-rate"]
+		if "poisonous-perception-distance" in data: training_replay.poisonous_perception_distance = data["poisonous-perception-distance"]
+		if "brain" in data: training_replay.brain = load_brain_from_data(data["brain"])
 		if "normalized" in data: training_replay.normalized = data["normalized"]
 		if "n-cones" in data: training_replay.n_cones = data["n-cones"]
 		if "fov" in data: training_replay.fov = data["fov"]

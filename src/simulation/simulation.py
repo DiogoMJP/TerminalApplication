@@ -46,6 +46,7 @@ class Simulation(CreatableFromParameters):
 		self.food				: list[Food]		= []
 		self.finished_food		: list[Food]		= []
 		self.sounds				: list[Sound]		= []
+		self.sound_history		: list[list[Sound]]	= []
 		self.main_loop_thread	: Optional[Thread]	= None
 
 	def get_n_alive_agents(self) -> int:
@@ -54,6 +55,9 @@ class Simulation(CreatableFromParameters):
 		return len([1 for food in self.food if food.alive])
 	def get_n_eaten_food(self) -> int:
 		return len([1 for food in self.finished_food if food.eaten])
+	
+	def update_sound_history(self) -> None:
+		self.sound_history += [self.sounds]
 
 	def create_agents(self) -> None:
 		for _ in range(self.n_agents):

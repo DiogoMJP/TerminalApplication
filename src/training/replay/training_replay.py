@@ -17,42 +17,46 @@ if TYPE_CHECKING:
 class TrainingReplay(Loadable):
 	def __init__(
 		self, n_generations: int, width: int, height: int, n_agents: int, agent_type: str, agents_lifespan: int,
-		agents_lifespan_extension: int, food_lifespan: int, perception_distance: int, eating_distance: int,
-		eating_number: int, max_time_steps: int, perception_processor_type: str, simulation_type: str,
+		agents_lifespan_extension: int, food_type: str, food_lifespan: int, perception_distance: int, eating_distance: int,
+		eating_number: int, max_time_steps: int, perception_processor_type: str, simulation_type: str, perception_nodes: list[str],
 		duration: float, average_performance: float, max_performance: int
 	):
-		self.n_generations				: int				= n_generations
-		self.width						: int				= width
-		self.height						: int				= height
-		self.n_agents					: int				= n_agents
-		self.agent_type					: str				= agent_type
-		self.agents_lifespan			: int				= agents_lifespan
-		self.agents_lifespan_extension	: int				= agents_lifespan_extension
-		self.food_lifespan				: int				= food_lifespan
-		self.perception_distance		: int				= perception_distance
-		self.eating_distance			: int				= eating_distance
-		self.eating_number				: int				= eating_number
-		self.max_time_steps				: int				= max_time_steps
-		self.perception_processor_type	: str				= perception_processor_type
-		self.simulation_type			: str				= simulation_type
-		self.duration					: float				= duration
-		self.average_performance		: float				= average_performance
-		self.max_performance			: int				= max_performance
-		self.food_spawn_rate			: Optional[float]	= None
-		self.n_food						: Optional[float]	= None
-		self.poisonous_food_rate		: Optional[float]	= None
-		self.brain						: Optional[Brain]	= None
-		self.n_cones					: Optional[int]		= None
-		self.normalized					: Optional[bool]	= None
-		self.fov						: Optional[int]		= None
-		self.see_agents					: Optional[bool]	= None
-		self.see_food					: Optional[bool]	= None
-		self.see_poisonous_food			: Optional[bool]	= None
-		self.see_walls					: Optional[bool]	= None
-		self.n_freq						: Optional[int]		= None
+		self.n_generations					: int				= n_generations
+		self.width							: int				= width
+		self.height							: int				= height
+		self.n_agents						: int				= n_agents
+		self.agent_type						: str				= agent_type
+		self.agents_lifespan				: int				= agents_lifespan
+		self.agents_lifespan_extension		: int				= agents_lifespan_extension
+		self.food_type						: str				= food_type
+		self.food_lifespan					: int				= food_lifespan
+		self.perception_distance			: int				= perception_distance
+		self.eating_distance				: int				= eating_distance
+		self.eating_number					: int				= eating_number
+		self.max_time_steps					: int				= max_time_steps
+		self.perception_processor_type		: str				= perception_processor_type
+		self.simulation_type				: str				= simulation_type
+		self.perception_nodes				: list[str]			= perception_nodes
+		self.duration						: float				= duration
+		self.average_performance			: float				= average_performance
+		self.max_performance				: int				= max_performance
+		self.food_spawn_rate				: Optional[float]	= None
+		self.n_food							: Optional[float]	= None
+		self.poisonous_food_rate			: Optional[float]	= None
+		self.poisonous_perception_distance	: Optional[float]	= None
+		self.brain							: Optional[Brain]	= None
+		self.n_cones						: Optional[int]		= None
+		self.normalized						: Optional[bool]	= None
+		self.fov							: Optional[int]		= None
+		self.see_agents						: Optional[bool]	= None
+		self.see_food						: Optional[bool]	= None
+		self.see_poisonous_food				: Optional[bool]	= None
+		self.see_walls						: Optional[bool]	= None
+		self.n_freq							: Optional[int]		= None
 	
 	def generate_simulation_parameters(self, brain: Brain) -> dict[str, Any]:
 		simulation_params = get_simulation_parameters(self.simulation_type)
+		simulation_params = [param[0] for param in simulation_params]
 		params = {
 			"brain"						: brain,
 			"width"						: self.width,
@@ -61,6 +65,7 @@ class TrainingReplay(Loadable):
 			"agent-type"				: self.agent_type,
 			"agents-lifespan"			: self.agents_lifespan,
 			"agents-lifespan-extension"	: self.agents_lifespan_extension,
+			"food-type"					: self.food_type,
 			"food-lifespan"				: self.food_lifespan,
 			"perception-distance"		: self.perception_distance,
 			"eating-distance"			: self.eating_distance,
@@ -71,6 +76,10 @@ class TrainingReplay(Loadable):
 			params["food-spawn-rate"] = self.food_spawn_rate
 		if "n-food" in simulation_params and self.n_food != None:
 			params["n-food"] = self.n_food
+		if "poisonous-food-rate" in simulation_params and self.poisonous_food_rate != None:
+			params["poisonous-food-rate"] = self.poisonous_food_rate
+		if "poisonous-perception-distance" in simulation_params and self.poisonous_perception_distance != None:
+			params["poisonous-perception-distance"] = self.poisonous_perception_distance
 		return params
 	
 	def create_graph(self, data: GraphData, path: str) -> None:

@@ -9,12 +9,14 @@ matplotlib.use('Agg')
 import json
 import matplotlib.pyplot as plt
 import textwrap
+from itertools	import product
 from math		import sqrt
 from pathlib	import Path
 from time		import time
 from typing		import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
+	from src.simulation			import Simulation
 	from src.training			import Training
 	from src.training.replay	import GraphData
 
@@ -61,6 +63,7 @@ class TerminalApplication(object):
 					for id in range(10):
 						self.train(training_type, config_name, eating_number, id)
 					self.create_graphs_from_training_data(training_type, config_name, eating_number)
+					self.generate_sound_graphs(training_type, config_name, eating_number)
 			self.generate_average_performance_graph(training_type)
 
 		print()
@@ -103,6 +106,97 @@ class TerminalApplication(object):
 		durations = [sim.last_time_step for sim in simulations]
 		for sim in simulations: del sim
 		return sum(durations)/len(durations), max(durations)
+	
+	def generate_sound_graphs(
+		self, training_type: str, config_file: str, eating_number: int
+	) -> None:
+		print()
+		print(f"Generating sound graphs for training {training_type} with config {config_file} and eating number {eating_number}")
+
+		def get_closest_food(x: int, y: int, t: int, sim: Simulation) -> tuple[float, float]:
+			reg_min_dist_sq = float('inf'); poi_min_dist_sq = float('inf')
+			i = 0
+			if len(sim.finished_food) == 0: return reg_min_dist_sq, poi_min_dist_sq
+			food = sim.finished_food[i]
+			while food.last_time_step < t:
+				dx = x - food.x
+				dy = y - food.y
+				dist_sq = dx * dx + dy * dy
+				if food.poisonous:
+					if dist_sq < poi_min_dist_sq:
+						poi_min_dist_sq = dist_sq
+				else:
+					if dist_sq < reg_min_dist_sq:
+						reg_min_dist_sq = dist_sq
+				i += 1
+				if i >= len(sim.finished_food): break
+				food = sim.finished_food[i]
+			return sqrt(reg_min_dist_sq), sqrt(poi_min_dist_sq)
+
+		for path in Path(f"saved_data/{training_type}/{config_file}/{eating_number}").iterdir():
+			if path.is_file() and path.suffix == ".json":
+				with open(path, "r") as fp:
+					training_replay = load_training_replay_from_data(json.load(fp))
+					if "sound-perception-node" not in training_replay.perception_nodes:
+						continue
+					if training_replay.n_freq == None or training_replay.n_freq == 0:
+						continue
+			else: continue
+
+			id = path.stem
+
+			regular_sounds : dict[tuple[int, ...], list[float]] = {
+				key: [] for key in product([0, 1], repeat=training_replay.n_freq)
+			}
+			poisonous_sounds : dict[tuple[int, ...], list[float]] = {
+				key: [] for key in product([0, 1], repeat=training_replay.n_freq)
+			}
+
+			brain = training_replay.brain
+			if brain == None:
+				raise Exception(f"{self.__class__.__name__}: generate_sound_graphs: Training has not been completed")
+			simulations : list[Simulation] = []
+			for _ in range(20):
+				sim = create_simulation(
+					training_replay.simulation_type, training_replay.generate_simulation_parameters(brain)
+				)
+				sim.start_loop()
+				simulations += [sim]
+			while not all([sim.finished for sim in simulations]):
+				pass
+			for sim in simulations:
+				for t, gen_sounds in enumerate(sim.sound_history):
+					for sound in gen_sounds:
+						reg_dist, poi_dist = get_closest_food(sound[0][0], sound[0][1], t, sim)
+						if reg_dist != float('inf'):
+							regular_sounds[sound[1]] += [reg_dist]
+						if poi_dist != float('inf'):
+							poisonous_sounds[sound[1]] += [poi_dist]
+			for sim in simulations: del sim
+		
+			labels = [str(key) for key in regular_sounds.keys()]
+			fig, ax = plt.subplots(layout="constrained")
+			dists = [dists for dists in regular_sounds.values()]
+			ax.hist(dists, bins=20, histtype='bar', label=labels)
+			plt.xlabel("Distance to closest food")
+			plt.ylabel("Number of sounds")
+			plt.title("Sound distances to closest regular food")
+			plt.legend()
+			Path(f"saved_data/{training_type}/{config_file}/{eating_number}/regular_sound_{id}.png").unlink(missing_ok=True)
+			path = f"saved_data/{training_type}/{config_file}/{eating_number}/regular_sound_{id}.png"
+			plt.savefig(path)
+			if training_replay.poisonous_food_rate != None and training_replay.poisonous_food_rate > 0:
+				fig, ax = plt.subplots(layout="constrained")
+				dists = [dists for dists in poisonous_sounds.values()]
+				ax.hist(dists, bins=20, histtype='bar', label=labels)
+				plt.xlabel("Distance to closest food")
+				plt.ylabel("Number of sounds")
+				plt.title("Sound distances to closest poisonous food")
+				plt.legend()
+				Path(f"saved_data/{training_type}/{config_file}/{eating_number}/poisonous_sound_{id}.png").unlink(missing_ok=True)
+				path = f"saved_data/{training_type}/{config_file}/{eating_number}/poisonous_sound_{id}.png"
+				plt.savefig(path)
+			plt.close('all')
 
 	def generate_graphs(self, starting_directory: str):
 		start_path = Path(f"saved_data/{starting_directory}")
@@ -117,7 +211,7 @@ class TerminalApplication(object):
 	
 	def generate_average_performance_graph(self, training_type: str) -> None:
 		with open(f"saved_data/{training_type}/performance.json", "r") as fp:
-			vals: dict[str, dict[str, dict[str, list[float]]]]= json.load(fp)
+			vals: dict[str, dict[str, dict[str, list[float]]]] = json.load(fp)
 		vals = {" ".join(key.split(" ")[1:]): val for key, val in vals.items()}
 		agents = tuple(vals[list(vals.keys())[0]].keys())
 		print()

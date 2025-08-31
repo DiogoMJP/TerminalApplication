@@ -55,7 +55,8 @@ class NeatTraining(Training):
 			with open(self.config_file, "r") as src_fp:
 				src = Template(src_fp.read())
 			pattern = {
-				"num_inputs"	: self.perception_processor.get_n_input()
+				"num_inputs"	: self.perception_processor.get_n_input(),
+				"num_outputs"	: self.perception_processor.get_n_output()
 			}
 			fp.write(src.substitute(pattern))
 

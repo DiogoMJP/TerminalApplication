@@ -22,7 +22,7 @@ class Food(CreatableFromParameters):
 		self.lifespan				: int	= lifespan
 		self.detection_radius		: int	= detection_radius
 		self.poisonous_food_rate	: float	= poisonous_food_rate
-		self.poisonous				: bool	= random() < poisonous_food_rate
+		self.poisonous				: bool	= random() <= poisonous_food_rate
 
 		self.eaten_by		: list[Agent]	= []
 		self.alive			: bool			= True

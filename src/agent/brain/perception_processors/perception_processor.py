@@ -1,7 +1,7 @@
 from __future__	import annotations
 
 from src.utils												import CreatableFromParameters, Loadable
-from src.agent.brain.perception_processors.perception_nodes	import create_perception_node
+from src.agent.brain.perception_processors.perception_nodes	import SoundPerceptionNode, create_perception_node
 
 from math	import sqrt
 from typing	import Any, Optional, Unpack, TYPE_CHECKING
@@ -29,6 +29,11 @@ class PerceptionProcessor(CreatableFromParameters, Loadable):
 	
 	def get_n_input(self) -> int:
 		return sum([perception_node.n_output for perception_node in self.perception_nodes])
+	def get_n_output(self) -> int:
+		if any([isinstance(pn, SoundPerceptionNode) for pn in self.perception_nodes]) and self.n_freq != None:
+			return 3 + self.n_freq
+		else:
+			return 3
 	
 	def get_closest_food(self, state: dict[str, Any], food_list: list[Food]) -> tuple[Food | None, float]:
 		x, y = state["x"], state["y"]
