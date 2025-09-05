@@ -39,7 +39,7 @@ class SoundPerceptionNode(PerceptionNode):
 					if any(sound_freq) > 0:
 						sound_vec[0] += dx / dist_sq
 						sound_vec[1] += dy / dist_sq
-			sound_angle = ((degrees(atan2(tanh(sound_vec[1]), tanh(sound_vec[0]))) - angle + 180) % 360 - 180) / 180
+			sound_angle = ((degrees(atan2(sound_vec[1], sound_vec[0])) - angle + 180) % 360 - 180) / 180
 		
 		return [tanh(val) for val in ears_output] + [sound_angle]
 

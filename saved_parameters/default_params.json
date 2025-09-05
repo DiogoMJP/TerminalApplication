@@ -46,20 +46,16 @@
 	},
 	"configs" : {
 		"01 Starting"					: {
-			"config-file"		: "config_files/01_starting_config",
-			"perception-nodes"	: ["angle-distance-perception-node"]
+			"config-file"		: "config_files/01_starting_config"
 		},
 		"02 Weight Range Change"		: {
-			"config-file"		: "config_files/02_weight_range_change_config",
-			"perception-nodes"	: ["angle-distance-perception-node"]
+			"config-file"		: "config_files/02_weight_range_change_config"
 		},
 		"03 Weight Params Change"		: {
-			"config-file"		: "config_files/03_weight_params_change_config",
-			"perception-nodes"	: ["angle-distance-perception-node"]
+			"config-file"		: "config_files/03_weight_params_change_config"
 		},
 		"04 Normalized Input"			: {
 			"config-file"		: "config_files/03_weight_params_change_config",
-			"perception-nodes"	: ["angle-distance-perception-node"],
 			"normalized"		: true
 		},
 		"05 Eyes"						: {
