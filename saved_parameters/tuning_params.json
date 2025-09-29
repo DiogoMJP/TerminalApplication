@@ -1,0 +1,102 @@
+{
+	"default-params" : {
+		"n-repeats"						: 10,
+		"eating-numbers"				: [1,2,3],
+		"n-generations"					: 25,
+		"width"							: 1000,
+		"height"						: 1000,
+		"n-agents"						: 15,
+		"agent-type"					: "default-agent",
+		"agents-lifespan"				: 350,
+		"agents-lifespan-extension"		: 350,
+		"food-type"						: "default-food",
+		"food-lifespan"					: 350,
+		"perception-distance"			: 200,
+		"poisonous-perception-distance"	: 100,
+		"eating-distance"				: 15,
+		"eating-number"					: 1,
+		"max-time-steps"				: 5000,
+		"simulation-type"				: "fixed-food-simulation",
+		"perception-processor-type"		: "default-perception-processor",
+		"food-spawn-rate"				: 0.02,
+		"n-food"						: 6,
+		"poisonous-food-rate"			: 0.0,
+		"perception-nodes"				: ["angle-distance-perception-node"],
+		"normalized"					: true,
+		"n-cones"						: 5,
+		"fov"							: 160,
+		"see-agents"					: true,
+		"see-food"						: true,
+		"see-poisonous-food"			: false,
+		"see-walls"						: false,
+		"n-freq"						: 2
+	},
+	"trainings" : {
+		"config1"		: {}
+	},
+	"configs" : {
+		"R_1_MP_0.01"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_1_mp_0.01_config"
+		},
+		"R_1_MP_0.03"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_1_mp_0.03_config"
+		},
+		"R_1_MP_0.05"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_1_mp_0.05_config"
+		},
+		"R_1_MP_0.07"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_1_mp_0.07_config"
+		},
+		"R_1_MP_0.1"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_1_mp_0.1_config"
+		},
+		"R_1_MP_0.2"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_1_mp_0.2_config"
+		},
+		"R_1_MP_0.3"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_1_mp_0.3_config"
+		},
+		"R_2_MP_0.01"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_2_mp_0.01_config"
+		},
+		"R_2_MP_0.03"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_2_mp_0.03_config"
+		},
+		"R_2_MP_0.05"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_2_mp_0.05_config"
+		},
+		"R_2_MP_0.07"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_2_mp_0.07_config"
+		},
+		"R_2_MP_0.1"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_2_mp_0.1_config"
+		},
+		"R_2_MP_0.2"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_2_mp_0.2_config"
+		},
+		"R_2_MP_0.3"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_2_mp_0.3_config"
+		},
+		"R_3_MP_0.01"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_3_mp_0.01_config"
+		},
+		"R_3_MP_0.03"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_3_mp_0.03_config"
+		},
+		"R_3_MP_0.05"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_3_mp_0.05_config"
+		},
+		"R_3_MP_0.07"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_3_mp_0.07_config"
+		},
+		"R_3_MP_0.1"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_3_mp_0.1_config"
+		},
+		"R_3_MP_0.2"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_3_mp_0.2_config"
+		},
+		"R_3_MP_0.3"					: {
+			"config-file"		: "config_files/parameter_tuning_config/r_3_mp_0.3_config"
+		}
+	}
+}

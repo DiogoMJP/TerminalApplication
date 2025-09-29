@@ -1,8 +1,8 @@
 {
 	"default-params" : {
 		"n-repeats"						: 10,
-		"eating-numbers"				: [1, 2, 3],
-		"n-generations"					: 25,
+		"eating-numbers"				: [2, 3],
+		"n-generations"					: 50,
 		"width"							: 1000,
 		"height"						: 1000,
 		"n-agents"						: 15,
@@ -17,7 +17,7 @@
 		"eating-number"					: 1,
 		"max-time-steps"				: 5000,
 		"config-file"					: "config_files/neat_params_config",
-		"simulation-type"				: "fixed-food-simulation",
+		"simulation-type"				: "random-food-simulation",
 		"perception-processor-type"		: "default-perception-processor",
 		"food-spawn-rate"				: 0.02,
 		"n-food"						: 6,
@@ -33,7 +33,9 @@
 		"n-freq"						: 2
 	},
 	"trainings" : {
-		"fixed_food"		: {},
+		"fixed_food"		: {
+			"simulation-type"	: "fixed-food-simulation"
+		},
 		"poisonous_food"	: {
 			"poisonous-food-rate"	: 0.4,
 			"simulation-type"		: "poisonous-food-simulation",

@@ -1,10 +1,9 @@
 from __future__	import annotations
 
-from numpy import argmax
-
 from src.agent.brain.perception_processors.perception_nodes	import PerceptionNode
 
-from math	import acos, cos, degrees, hypot, sin, sqrt, radians
+import numpy	as np
+from math	import cos, radians, sin, sqrt
 from typing	import Any, Unpack, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -31,6 +30,49 @@ class EyesPerceptionNode(PerceptionNode):
 		self.see_walls			: bool	= see_walls
 
 		self.view_cone	: float	= fov / n_cones
+	
+	def _normalize(self, values: np.ndarray, perception_distance: float) -> np.ndarray:
+		if self.normalized:
+			return 1.0 - (values / perception_distance)
+		return perception_distance - values
+	
+	def process_entity_batch(
+		self, x: float, y: float, entities: np.ndarray,
+		perception_distance_sq: float, cones: np.ndarray, cos_threshold: float
+	) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+		if entities.size == 0:
+			return np.array([], dtype=int), np.array([], dtype=float), np.array([], dtype=int)
+		
+		dxdy_full = entities - np.array([x, y])
+		dist_sq_full = np.sum(dxdy_full**2, axis=1)
+
+		# filter out too far or overlapping entities
+		valid_mask = (dist_sq_full > 0) & (dist_sq_full <= perception_distance_sq)
+		if not np.any(valid_mask):
+			return np.array([], dtype=int), np.array([], dtype=float), np.array([], dtype=int)
+		
+		valid_indices = np.nonzero(valid_mask)[0]
+		dxdy = dxdy_full[valid_mask]
+		dist = np.sqrt(dist_sq_full[valid_mask])[:, None]
+		normed = dxdy / dist
+
+		# dot products with all cones → shape (N, n_cones)
+		dots = normed @ cones.T
+
+		# best cone per entity
+		best_idx = np.argmax(dots, axis=1)
+		best_val = np.max(dots, axis=1)
+
+		# keep only those inside FOV
+		keep_mask = best_val > cos_threshold
+		if not np.any(keep_mask):
+			return np.array([], dtype=int), np.array([], dtype=float), np.array([], dtype=int)
+		
+		kept_cone_indices = best_idx[keep_mask]
+		kept_dists = dist.flatten()[keep_mask]
+		kept_original_indices = valid_indices[keep_mask]
+
+		return kept_cone_indices, kept_dists, kept_original_indices
 
 	def process_entity(
 		self, x: float, y: float, e_x: float, e_y: float,
@@ -58,94 +100,88 @@ class EyesPerceptionNode(PerceptionNode):
 		
 		return (best_i, dist) if best_i != -1 else None
 	
-	def process_agents(
-		self, state: dict[str, Any], perception_distance: float,
-		agent_list: list[Agent], cones: list[tuple[float, float]]
-	) -> list[float]:
-		x, y = state["x"], state["y"]
-		output = [perception_distance] * self.n_cones
-		perception_distance_sq = perception_distance ** 2
-		cos_threshold = cos(radians(self.view_cone / 2))
+	def process_agents(self, state: dict[str, Any], perception_distance: float,
+		agent_list: list[Agent], cones: np.ndarray
+	) -> np.ndarray:
+		if not agent_list:
+			return np.zeros(self.n_cones)
 
-		for agent in agent_list:
-			result = self.process_entity(
-				x, y, agent.get_from_state("x"), agent.get_from_state("y"),
-				perception_distance_sq, cones, cos_threshold
-			)
-			if result:
-				i, dist = result
-				if dist < output[i]: output[i] = dist
+		entities = np.array([[a.get_from_state("x"), a.get_from_state("y")] for a in agent_list])
+		indices, dists, _kept  = self.process_entity_batch(
+			state["x"], state["y"], entities,
+			perception_distance**2, cones, cos(radians(self.view_cone / 2))
+		)
 
-		if self.normalized:
-			return [1 - (val / perception_distance) for val in output]
-		else:
-			return [perception_distance - val for val in output]
+		output = np.full(self.n_cones, perception_distance, dtype=float)
+		if indices.size:
+			np.minimum.at(output, indices, dists)  # inplace min update
+		return self._normalize(output, perception_distance)
 	
-	def process_food(
-		self, state: dict[str, Any], perception_distance: float, poisonous_detection_distance: int,
-		food_list: list[Food], cones: list[tuple[float, float]]
-	) -> list[list[float]]:
-		x, y = state["x"], state["y"]
-		perception_distance_sq = perception_distance ** 2
-		cos_threshold = cos(radians(self.view_cone / 2))
+	def process_food(self, state: dict[str, Any], perception_distance: float,
+		poisonous_detection_distance: int, food_list: list[Food], cones: np.ndarray
+	) -> list[np.ndarray]:
+		if not food_list:
+			if self.see_poisonous_food:
+				return [np.zeros(self.n_cones), np.zeros(self.n_cones)]
+			return [np.zeros(self.n_cones)]
 
-		regular_output = [perception_distance] * self.n_cones
-		poisonous_output = [perception_distance] * self.n_cones
-		
-		for food in food_list:
-			result = self.process_entity(
-				x, y, food.x, food.y, perception_distance_sq,
-				cones, cos_threshold
-			)
-			if result is None: continue
-			i, dist = result
-			if self.see_poisonous_food and food.poisonous and dist <= poisonous_detection_distance:
-				if dist < poisonous_output[i]: poisonous_output[i] = dist
+		entities = np.array([[f.x, f.y] for f in food_list])
+		indices, dists, kept_original_indices = self.process_entity_batch(
+			state["x"], state["y"], entities,
+			perception_distance**2, cones, cos(radians(self.view_cone / 2))
+		)
+
+		regular = np.full(self.n_cones, perception_distance, dtype=float)
+		poisonous = np.full(self.n_cones, perception_distance, dtype=float)
+
+		if indices.size:
+			if self.see_poisonous_food:
+				# produce boolean array of poisonous flags for kept items
+				poison_flags = np.array([food_list[i].poisonous for i in kept_original_indices], dtype=bool)
+				# mask where a kept item is considered poisonous (and within poisonous_detection_distance)
+				poison_by_dist = (dists <= poisonous_detection_distance) & poison_flags
+
+				# update poisonous channel for those that are poisonous & within poison detection distance
+				if np.any(poison_by_dist):
+					np.minimum.at(poisonous, indices[poison_by_dist], dists[poison_by_dist])
+
+				# the remaining items update the regular channel
+				regular_mask = ~poison_by_dist
+				if np.any(regular_mask):
+					np.minimum.at(regular, indices[regular_mask], dists[regular_mask])
 			else:
-				if dist < regular_output[i]: regular_output[i] = dist
-		
-		def normalize(output):
-			if not self.normalized:
-				return [perception_distance - val for val in output]
-			else:
-				return [1 - (val / perception_distance) for val in output]
-			
+				# all detected food goes to regular channel
+				np.minimum.at(regular, indices, dists)
+
 		if self.see_poisonous_food:
-			return [normalize(regular_output), normalize(poisonous_output)]
-		else:
-			return [normalize(regular_output)]
+			return [self._normalize(regular, perception_distance),
+					self._normalize(poisonous, perception_distance)]
+		return [self._normalize(regular, perception_distance)]
 	
-	def process_walls(
-		self, state: dict[str, Any], perception_distance: float, width: int, height: int,
-		cones: list[tuple[float, float]]
-	) -> list[float]:
+	def process_walls(self, state: dict[str, Any], perception_distance: float,
+		width: int, height: int, cones: np.ndarray
+	) -> np.ndarray:
 		x, y = state["x"], state["y"]
-		output = [0.0 for _ in range(self.n_cones)]
+		output = np.empty(self.n_cones, dtype=float)
 
 		for i, (dx, dy) in enumerate(cones):
 			min_dist = perception_distance
-
 			if dx != 0.0:
-				t = (0 - x) / dx
-				if t >= 0:
-					y_hit = y + dy * t
-					if 0 <= y_hit <= height: min_dist = min(min_dist, t)
-				t = (width - x) / dx
-				if t >= 0:
-					y_hit = y + dy * t
-					if 0 <= y_hit <= height: min_dist = min(min_dist, t)
+				for bx in (0, width):
+					t = (bx - x) / dx
+					if t >= 0:
+						y_hit = y + dy * t
+						if 0 <= y_hit <= height: min_dist = min(min_dist, t)
 			if dy != 0.0:
-				t = (0 - y) / dy
-				if t >= 0:
-					x_hit = x + dx * t
-					if 0 <= x_hit <= width: min_dist = min(min_dist, t)
-				t = (height - y) / dy
-				if t >= 0:
-					x_hit = x + dx * t
-					if 0 <= x_hit <= width: min_dist = min(min_dist, t)
-			output[i] = 1 - (min_dist / perception_distance) if self.normalized else (perception_distance - min_dist)
+				for by in (0, height):
+					t = (by - y) / dy
+					if t >= 0:
+						x_hit = x + dx * t
+						if 0 <= x_hit <= width: min_dist = min(min_dist, t)
 
-		return output
+			output[i] = min_dist
+
+		return self._normalize(output, perception_distance)
 	
 	def process(
     	self, state: dict[str, Any], perception_distance: int, poisonous_detection_distance: int, 
@@ -154,41 +190,40 @@ class EyesPerceptionNode(PerceptionNode):
 		angle = radians(state["angle"])
 		half_fov = radians(self.fov / 2)
 		cone_step = radians(self.view_cone)
-		cones = [
-			(cos(angle - half_fov + cone_step * (i + 0.5)), sin(angle - half_fov + cone_step * (i + 0.5)))
+
+		cones = np.array([
+			(cos(angle - half_fov + cone_step * (i + 0.5)),
+			 sin(angle - half_fov + cone_step * (i + 0.5)))
 			for i in range(self.n_cones)
-		]
-		output = [[] for _ in range(self.n_cones)]
+		])
+
+		output_parts = []
 
 		if self.see_agents:
-			if "agent_list" not in environment_data:
-				raise Exception(f"{self.__class__.__name__}: Missing required environment data: agent_list")
-			agent_list = environment_data["agent_list"]
-			agents_output = self.process_agents(state, perception_distance, agent_list, cones)
-			for i in range(self.n_cones):
-				output[i] += [agents_output[i]]
-		
+			agents_output = self.process_agents(state, perception_distance,
+				environment_data.get("agent_list", []), cones)
+			output_parts.append(agents_output)
+
 		if self.see_food:
-			if "food_list" not in environment_data:
-				raise Exception(f"{self.__class__.__name__}: Missing required environment data: food_list")
-			food_list = environment_data["food_list"]
-			food_output = self.process_food(
-				state, perception_distance, poisonous_detection_distance, food_list, cones
-			)
-			for i in range(self.n_cones):
-				output[i] += [food_output[j][i] for j in range(len(food_output))]
-		
+			food_output = self.process_food(state, perception_distance,
+				poisonous_detection_distance, environment_data.get("food_list", []), cones)
+			output_parts.extend(food_output)
+
 		if self.see_walls:
 			walls_output = self.process_walls(state, perception_distance, width, height, cones)
-			for i in range(self.n_cones):
-				output[i] += [walls_output[i]]
+			output_parts.append(walls_output)
 
-		final_output = []
-		for freq in output:
-			max_idx = argmax(freq)
-			final_output += [freq[i] if i == max_idx else 0.0 for i in range(len(freq))]
+		if not output_parts:
+			return [0.0] * (self.n_cones * self.n_output)
 
-		return final_output
+		stacked = np.stack(output_parts, axis=1)  # (n_cones, features)
+		max_idx = np.argmax(stacked, axis=1)
+		final_output = np.zeros_like(stacked)
+
+		for i, j in enumerate(max_idx):
+			final_output[i, j] = stacked[i, j]
+
+		return final_output.flatten().tolist()
 
 	def to_dict(self) -> dict[str, Any]:
 		return {"type"	: "eyes-perception-node"}

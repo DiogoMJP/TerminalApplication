@@ -51,16 +51,14 @@ class TerminalApplication(object):
 
 				self.params = dict(self.default_params)
 				for key, val in train_params.items():
-					if key not in self.params.keys():
-						raise Exception(f"{self.__class__.__name__}: Invalid parameter: {key}")
-					else: self.params[key] = val
+					self.params[key] = val
 				for key, val in conf_params.items():
-					if key not in self.params.keys():
-						raise Exception(f"{self.__class__.__name__}: Invalid parameter: {key}")
-					else: self.params[key] = val
+					self.params[key] = val
 
+				if "n-repeats" not in self.params.keys():
+					raise Exception(f"{self.__class__.__name__}: Invalid parameter: n-repeats")
 				for eating_number in self.params["eating-numbers"]:
-					for id in range(10):
+					for id in range(self.params["n-repeats"]):
 						self.train(training_type, config_name, eating_number, id)
 					self.create_graphs_from_training_data(training_type, config_name, eating_number)
 					self.generate_sound_graphs(training_type, config_name, eating_number)

@@ -1,0 +1,290 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "/schemas/parameter_file",
+    "title": "ParameterFile",
+    "description": "File that defines the parameters that characterize how the agents are trained",
+    "type": "object",
+    "properties": {
+        "default-params": {
+            "$ref": "#/$defs/parameters"
+        },
+        "trainings": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/$defs/parameters"
+            }
+        },
+        "configs": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/$defs/parameters"
+            }
+        }
+    },
+    "$defs": {
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "eating-numbers": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "minimum": 1
+                    }
+                },
+                "n-generations": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "width": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "height": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "n-agents": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "agent-type": {
+                    "$comment": "Different types may be added",
+                    "enum": [
+                        "default-agent",
+                        "stopped-by-walls-agent",
+                        "sound-agent"
+                    ]
+                },
+                "agents-lifespan": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "agents-lifespan-extension": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "food-type": {
+                    "$comment": "Different types may be added",
+                    "enum": [
+                        "default-agent",
+                        "stopped-by-walls-agent",
+                        "sound-agent"
+                    ]
+                },
+                "food-lifespan": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "perception-distance": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "poisonous-perception-distance": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "eating-distance": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "eating-number": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "max-time-steps": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "config-file": {
+                    "$comment": "Different files may be added",
+                    "enum": [
+                        "config_files/01_starting_config",
+                        "config_files/02_weight_range_change_config",
+                        "config_files/03_weight_params_change_config"
+                    ]
+                },
+                "simulation-type": {
+                    "$comment": "Different types may be added",
+                    "enum": [
+                        "random-food-simulation",
+                        "fixed-food-simulation",
+                        "poisonous-food-simulation"
+                    ]
+                },
+                "perception-processor-type": {
+                    "$comment": "Different types may be added",
+                    "enum": [
+                        "default-perception-processor"
+                    ]
+                },
+                "food-spawn-rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "n-food": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "poisonous-food-rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "perception-nodes": {
+                    "type": "array",
+                    "items": {
+                        "$comment": "Different types may be added",
+                        "enum": [
+                            "angle-distance-perception-node",
+                            "eyes-perception-node",
+                            "sound-perception-node"
+                        ]
+                    }
+                },
+                "normalized": {
+                    "type": "boolean"
+                },
+                "n-cones": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "fov": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 360
+                },
+                "see-agents": {
+                    "type": "boolean"
+                },
+                "see-food": {
+                    "type": "boolean"
+                },
+                "see-poisonous-food": {
+                    "type": "boolean"
+                },
+                "see-walls": {
+                    "type": "boolean"
+                },
+                "n-freq": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            },
+            "required": [
+                "eating-numbers", "n-generations", "width", "height", "agent-type",
+                "agents-lifespan", "agents-lifespan-extension", "food-type",
+                "food-lifespan", "perception-distance", "eating-distance",
+                "eating-number", "max-time-steps", "config-file", "simulation-type",
+                "perception-processor-type", "perception-nodes"
+            ],
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {"simulation-type": {"const": "random-food-simulation"}}
+                    },
+                    "then": {
+                        "required": ["food-spawn-rate"]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {"simulation-type": {"const": "fixed-food-simulation"}}
+                    },
+                    "then": {
+                        "required": ["n-food"]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {"simulation-type": {"const": "poisonous-food-simulation"}}
+                    },
+                    "then": {
+                        "required": ["poisonous-food-rate", "poisonous-perception-distance", "n-food"]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {"perception-node": {"contains": "angle-distance-perception-node"}}
+                    },
+                    "then": {
+                        "required": ["normalized", "see-agents", "see-food", "see-poisonous-food"]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {"perception-node": {"contains": "eyes-perception-node"}}
+                    },
+                    "then": {
+                        "required": [
+                            "n-cones", "normalized", "fov", "see-agents",
+                            "see-food", "see-poisonous-food", "see-walls"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {"perception-node": {"contains": "sound-perception-node"}}
+                    },
+                    "then": {
+                        "required": ["n-freq"]
+                    }
+                }
+            ]
+        }
+    },
+    "allOf": [
+        {
+            "if": {
+                "properties": {"simulation-type": {"const": "random-food-simulation"}}
+            },
+            "then": {
+                "required": ["food-spawn-rate"]
+            }
+        },
+        {
+            "if": {
+                "properties": {"simulation-type": {"const": "fixed-food-simulation"}}
+            },
+            "then": {
+                "required": ["n-food"]
+            }
+        },
+        {
+            "if": {
+                "properties": {"simulation-type": {"const": "poisonous-food-simulation"}}
+            },
+            "then": {
+                "required": ["poisonous-food-rate", "poisonous-perception-distance", "n-food"]
+            }
+        },
+        {
+            "if": {
+                "properties": {"perception-node": {"contains": "angle-distance-perception-node"}}
+            },
+            "then": {
+                "required": ["normalized", "see-agents", "see-food", "see-poisonous-food"]
+            }
+        },
+        {
+            "if": {
+                "properties": {"perception-node": {"contains": "eyes-perception-node"}}
+            },
+            "then": {
+                "required": [
+                    "n-cones", "normalized", "fov", "see-agents",
+                    "see-food", "see-poisonous-food", "see-walls"
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {"perception-node": {"contains": "sound-perception-node"}}
+            },
+            "then": {
+                "required": ["n-freq"]
+            }
+        }
+    ]
+}
