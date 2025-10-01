@@ -31,11 +31,11 @@
     
     # node bias options
     bias_init_mean    = 0.0
-    bias_init_stdev   = 0.33
+    bias_init_stdev   = 0.66
     bias_init_type    = gaussian
-    bias_max_value    = 1
-    bias_min_value    = -1
-    bias_mutate_power = 0.1
+    bias_max_value    = 2
+    bias_min_value    = -2
+    bias_mutate_power = 0.05
     bias_mutate_rate  = 0.6
     bias_replace_rate = 0.1
     
@@ -81,9 +81,9 @@
     
     # connection weight options
     weight_init_mean    = 0.0
-    weight_init_stdev   = 0.33
-    weight_max_value    = 1
-    weight_min_value    = -1
-    weight_mutate_power = 0.1
+    weight_init_stdev   = 0.66
+    weight_max_value    = 2
+    weight_min_value    = -2
+    weight_mutate_power = 0.05
     weight_mutate_rate  = 0.65
     weight_replace_rate = 0.1
