@@ -46,10 +46,11 @@ class SoundAgent(Agent):
 						"y", int((self.get_from_state("y") + sin(radians(self.get_from_state("angle"))) * 4) % self.height)
 					)
 				food, dist = self.brain.get_closest_food(self.state, simulation.food)
-				simulation.add_sound(
-					((int(self.get_from_state("x")), int(self.get_from_state("y"))),
-					tuple(sound))
-				)
+				if not all(s == 0 for s in sound):
+					simulation.add_sound(
+						((int(self.get_from_state("x")), int(self.get_from_state("y"))),
+						tuple(sound))
+					)
 				if food != None and dist < self.eating_distance:
 					food.eaten_by += [self]
 			self.save_state()
