@@ -33,7 +33,7 @@ class SoundAgent(Agent):
 				l_rot, r_rot, speed, *sound = self.brain.get_action(
 					self.state, self.perception_distance, self.poisonous_perception_distance,
 					self.width, self.height, agent_list=agent_list, food_list=simulation.food,
-					sound_list=simulation.sounds
+					sound_list=simulation.prev_sounds
 				)
 				change = -3 if l_rot else 3 if r_rot else 0
 				self.set_in_state("angle", self.get_from_state("angle") + change)

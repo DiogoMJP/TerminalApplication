@@ -26,7 +26,7 @@
 		"normalized"					: true,
 		"n-cones"						: 5,
 		"fov"							: 160,
-		"see-agents"					: true,
+		"see-agents"					: false,
 		"see-food"						: true,
 		"see-poisonous-food"			: false,
 		"see-walls"						: false,

@@ -46,6 +46,7 @@ class Simulation(CreatableFromParameters):
 		self.food				: list[Food]		= []
 		self.finished_food		: list[Food]		= []
 		self.sounds				: list[Sound]		= []
+		self.prev_sounds		: list[Sound]		= []
 		self.sound_history		: list[list[Sound]]	= []
 		self.main_loop_thread	: Optional[Thread]	= None
 
@@ -54,7 +55,7 @@ class Simulation(CreatableFromParameters):
 	def get_n_food(self) -> int:
 		return len([1 for food in self.food if food.alive])
 	def get_n_eaten_food(self) -> int:
-		return len([1 for food in self.finished_food if food.eaten])
+		return len([1 for food in self.finished_food if food.eaten and not food.poisonous])
 	
 	def update_sound_history(self) -> None:
 		self.sound_history += [self.sounds]

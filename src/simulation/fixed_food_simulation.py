@@ -41,6 +41,7 @@ class FixedFoodSimulation(Simulation):
 				self.last_time_step = self.time_step
 				break
 			self.update_sound_history()
+			self.prev_sounds = self.sounds
 			self.sounds = []
 			self.time_step += 1
 		for agent in self.agents:

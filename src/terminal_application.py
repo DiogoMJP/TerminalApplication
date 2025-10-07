@@ -131,6 +131,7 @@ class TerminalApplication(object):
 				food = sim.finished_food[i]
 			return sqrt(reg_min_dist_sq), sqrt(poi_min_dist_sq)
 
+		training_replays = []
 		for path in Path(f"saved_data/{training_type}/{config_file}/{eating_number}").iterdir():
 			if path.is_file() and path.suffix == ".json":
 				with open(path, "r") as fp:
@@ -139,62 +140,69 @@ class TerminalApplication(object):
 						continue
 					if training_replay.n_freq == None or training_replay.n_freq == 0:
 						continue
+					training_replays += [training_replay]
 			else: continue
-
-			id = path.stem
-
-			regular_sounds : dict[tuple[int, ...], list[float]] = {
-				key: [] for key in product([0, 1], repeat=training_replay.n_freq)
-			}
-			poisonous_sounds : dict[tuple[int, ...], list[float]] = {
-				key: [] for key in product([0, 1], repeat=training_replay.n_freq)
-			}
-
-			brain = training_replay.brain
-			if brain == None:
-				raise Exception(f"{self.__class__.__name__}: generate_sound_graphs: Training has not been completed")
-			simulations : list[Simulation] = []
-			for _ in range(20):
-				sim = create_simulation(
-					training_replay.simulation_type, training_replay.generate_simulation_parameters(brain)
-				)
-				sim.start_loop()
-				simulations += [sim]
-			while not all([sim.finished for sim in simulations]):
-				pass
-			for sim in simulations:
-				for t, gen_sounds in enumerate(sim.sound_history):
-					for sound in gen_sounds:
-						reg_dist, poi_dist = get_closest_food(sound[0][0], sound[0][1], t, sim)
-						if reg_dist != float('inf'):
-							regular_sounds[sound[1]] += [reg_dist]
-						if poi_dist != float('inf'):
-							poisonous_sounds[sound[1]] += [poi_dist]
-			for sim in simulations: del sim
+		if training_replays == []:
+			return
 		
-			labels = [str(key) for key in regular_sounds.keys()]
+		training_replay = max(
+			training_replays, key=lambda tr: tr.average_performance
+		)
+
+		regular_sounds : dict[tuple[int, ...], list[float]] = {
+			key: [] for key in product([0, 1], repeat=training_replay.n_freq)
+			if not all(v == 0 for v in key)
+		}
+		poisonous_sounds : dict[tuple[int, ...], list[float]] = {
+			key: [] for key in product([0, 1], repeat=training_replay.n_freq)
+			if not all(v == 0 for v in key)
+		}
+
+		brain = training_replay.brain
+		if brain == None:
+			raise Exception(f"{self.__class__.__name__}: generate_sound_graphs: Training has not been completed")
+		simulations : list[Simulation] = []
+		for _ in range(20):
+			sim = create_simulation(
+				training_replay.simulation_type, training_replay.generate_simulation_parameters(brain)
+			)
+			sim.start_loop()
+			simulations += [sim]
+		while not all([sim.finished for sim in simulations]):
+			pass
+		for sim in simulations:
+			for t, gen_sounds in enumerate(sim.sound_history):
+				for sound in gen_sounds:
+					reg_dist, poi_dist = get_closest_food(sound[0][0], sound[0][1], t, sim)
+					if reg_dist != float('inf'):
+						regular_sounds[sound[1]] += [reg_dist]
+					if poi_dist != float('inf'):
+						poisonous_sounds[sound[1]] += [poi_dist]
+		for sim in simulations: del sim
+	
+		labels = [str(key) for key in regular_sounds.keys()]
+		fig, ax = plt.subplots(layout="constrained")
+		dists = [dists for dists in regular_sounds.values()]
+		ax.hist(dists, bins=range(0, 500, 20), color=['#D81B60','#1E88E5','#FFC107'], edgecolor = "white", histtype='bar', label=labels, stacked=True)
+		plt.xlabel("Distance to closest food")
+		plt.ylabel("Number of sounds")
+		plt.title("Sound distances to closest regular food")
+		plt.legend(title="Sound Channels")
+		path = f"saved_data/{training_type}/{config_file}/{eating_number}/regular_sound_.svg"
+		Path(path).unlink(missing_ok=True)
+		plt.savefig(path, format="svg")
+		if training_replay.poisonous_food_rate != None and training_replay.poisonous_food_rate > 0:
 			fig, ax = plt.subplots(layout="constrained")
-			dists = [dists for dists in regular_sounds.values()]
-			ax.hist(dists, bins=20, histtype='bar', label=labels)
+			dists = [dists for dists in poisonous_sounds.values()]
+			ax.hist(dists, bins=range(0, 500, 20), color=['#D81B60','#1E88E5','#FFC107'], edgecolor = "white", histtype='bar', label=labels, stacked=True)
 			plt.xlabel("Distance to closest food")
 			plt.ylabel("Number of sounds")
-			plt.title("Sound distances to closest regular food")
-			plt.legend()
-			Path(f"saved_data/{training_type}/{config_file}/{eating_number}/regular_sound_{id}.png").unlink(missing_ok=True)
-			path = f"saved_data/{training_type}/{config_file}/{eating_number}/regular_sound_{id}.png"
-			plt.savefig(path)
-			if training_replay.poisonous_food_rate != None and training_replay.poisonous_food_rate > 0:
-				fig, ax = plt.subplots(layout="constrained")
-				dists = [dists for dists in poisonous_sounds.values()]
-				ax.hist(dists, bins=20, histtype='bar', label=labels)
-				plt.xlabel("Distance to closest food")
-				plt.ylabel("Number of sounds")
-				plt.title("Sound distances to closest poisonous food")
-				plt.legend()
-				Path(f"saved_data/{training_type}/{config_file}/{eating_number}/poisonous_sound_{id}.png").unlink(missing_ok=True)
-				path = f"saved_data/{training_type}/{config_file}/{eating_number}/poisonous_sound_{id}.png"
-				plt.savefig(path)
-			plt.close('all')
+			plt.title("Sound distances to closest poisonous food")
+			plt.legend(title="Sound Channels")
+			path = f"saved_data/{training_type}/{config_file}/{eating_number}/poisonous_sound_.svg"
+			Path(path).unlink(missing_ok=True)
+			plt.savefig(path, format="svg")
+		plt.close('all')
 
 	def generate_graphs(self, starting_directory: str):
 		start_path = Path(f"saved_data/{starting_directory}")
@@ -238,8 +246,8 @@ class TerminalApplication(object):
 		plt.xlabel("Configurations")
 		plt.ylabel("Average Duration (time steps)")
 		fig.suptitle("Average agent performance")
-		Path(f"saved_data/{training_type}/average_performance.png").unlink(missing_ok=True)
-		fig.savefig(f"saved_data/{training_type}/average_performance.png")
+		Path(f"saved_data/{training_type}/average_performance.svg").unlink(missing_ok=True)
+		fig.savefig(f"saved_data/{training_type}/average_performance.svg", format="svg")
 		plt.close('all')
 
 	def join_graph_data(self, data_list: list[GraphData]) -> GraphData:
@@ -262,8 +270,8 @@ class TerminalApplication(object):
 		plt.xlabel(data["x-label"])
 		plt.ylabel(data["y-label"])
 		plt.title(data["title"])
-		Path(path + f"/{data['filename']}.png").unlink(missing_ok=True)
-		plt.savefig(path + f"/{data['filename']}.png")
+		Path(path + f"/{data['filename']}.svg").unlink(missing_ok=True)
+		plt.savefig(path + f"/{data['filename']}.svg", format="svg")
 		plt.close('all')
 
 	def create_graphs_from_training_data(self, training_type: str, config_file: str, eating_number: int) -> None:
