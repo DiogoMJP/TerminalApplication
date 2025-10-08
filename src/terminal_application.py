@@ -242,7 +242,7 @@ class TerminalApplication(object):
 		if brain == None:
 			raise Exception(f"{self.__class__.__name__}: generate_sound_graphs: Training has not been completed")
 		simulations : list[Simulation] = []
-		for _ in range(5):
+		for _ in range(20):
 			sim = create_simulation(
 				training_replay.simulation_type, training_replay.generate_simulation_parameters(brain)
 			)
