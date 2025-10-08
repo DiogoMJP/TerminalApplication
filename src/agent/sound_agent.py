@@ -12,11 +12,11 @@ if TYPE_CHECKING:
 
 class SoundAgent(Agent):
 	def __init__(
-			self, brain: Brain, width: int, height: int, lifespan: int, lifespan_extension: int,
+			self, id: int, brain: Brain, width: int, height: int, lifespan: int, lifespan_extension: int,
 			perception_distance: int, poisonous_perception_distance: int, eating_distance: int
 		):
 		super().__init__(
-			brain, width, height, lifespan, lifespan_extension, perception_distance,
+			id, brain, width, height, lifespan, lifespan_extension, perception_distance,
 			poisonous_perception_distance, eating_distance, {"x": None, "y": None, "angle": None}
 		)
 
@@ -48,8 +48,11 @@ class SoundAgent(Agent):
 				food, dist = self.brain.get_closest_food(self.state, simulation.food)
 				if not all(s == 0 for s in sound):
 					simulation.add_sound(
-						((int(self.get_from_state("x")), int(self.get_from_state("y"))),
-						tuple(sound))
+						(
+							self.id,
+							(int(self.get_from_state("x")), int(self.get_from_state("y"))),
+							tuple(sound)
+						)
 					)
 				if food != None and dist < self.eating_distance:
 					food.eaten_by += [self]
@@ -65,7 +68,7 @@ class SoundAgent(Agent):
 	@staticmethod
 	def get_parameters() -> tuple[tuple[str, type], ...]:
 		return (
-			("brain", Brain), ("width", int), ("height", int), ("agents-lifespan", int),
+			("id", int), ("brain", Brain), ("width", int), ("height", int), ("agents-lifespan", int),
 			("agents-lifespan-extension", int), ("perception-distance", int),
 			("poisonous-perception-distance", int), ("eating-distance", int)
 		)
@@ -80,7 +83,7 @@ class SoundAgent(Agent):
 					f"{__class__.__name__}: Invalid type for parameter '{key}': expected {param_type}, got {type(params[key])}"
 				)
 		return SoundAgent(
-			params["brain"], params["width"], params["height"], params["agents-lifespan"],
+			params["id"], params["brain"], params["width"], params["height"], params["agents-lifespan"],
 			params["agents-lifespan-extension"], params["perception-distance"],
 			params["poisonous-perception-distance"], params["eating-distance"]
 		)

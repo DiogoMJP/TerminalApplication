@@ -29,7 +29,7 @@ class SoundPerceptionNode(PerceptionNode):
 
 		if len(sound_list) != 0:
 			sound_vec = [0.0, 0.0]
-			for sound_pos, sound_freq in sound_list:
+			for _, sound_pos, sound_freq in sound_list:
 				dx = 0.04*(sound_pos[0] - x)
 				dy = 0.04*(sound_pos[1] - y)
 				dist_sq = dx*dx + dy*dy

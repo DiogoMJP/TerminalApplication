@@ -61,7 +61,8 @@ class TerminalApplication(object):
 					for id in range(self.params["n-repeats"]):
 						self.train(training_type, config_name, eating_number, id)
 					self.create_graphs_from_training_data(training_type, config_name, eating_number)
-					self.generate_sound_graphs(training_type, config_name, eating_number)
+					self.generate_distance_sound_graphs(training_type, config_name, eating_number)
+					self.generate_distance_change_sound_graphs(training_type, config_name, eating_number)
 			self.generate_average_performance_graph(training_type)
 
 		print()
@@ -105,11 +106,11 @@ class TerminalApplication(object):
 		for sim in simulations: del sim
 		return sum(durations)/len(durations), max(durations)
 	
-	def generate_sound_graphs(
+	def generate_distance_sound_graphs(
 		self, training_type: str, config_file: str, eating_number: int
 	) -> None:
 		print()
-		print(f"Generating sound graphs for training {training_type} with config {config_file} and eating number {eating_number}")
+		print(f"Generating distance sound graphs for training {training_type} with config {config_file} and eating number {eating_number}")
 
 		def get_closest_food(x: int, y: int, t: int, sim: Simulation) -> tuple[float, float]:
 			reg_min_dist_sq = float('inf'); poi_min_dist_sq = float('inf')
@@ -173,7 +174,7 @@ class TerminalApplication(object):
 		for sim in simulations:
 			for t, gen_sounds in enumerate(sim.sound_history):
 				for sound in gen_sounds:
-					reg_dist, poi_dist = get_closest_food(sound[0][0], sound[0][1], t, sim)
+					reg_dist, poi_dist = get_closest_food(sound[1][0], sound[1][1], t, sim)
 					if reg_dist != float('inf'):
 						regular_sounds[sound[1]] += [reg_dist]
 					if poi_dist != float('inf'):
@@ -203,6 +204,89 @@ class TerminalApplication(object):
 			Path(path).unlink(missing_ok=True)
 			plt.savefig(path, format="svg")
 		plt.close('all')
+	
+	def generate_distance_change_sound_graphs(
+		self, training_type: str, config_file: str, eating_number: int
+	) -> None:
+		print()
+		print(f"Generating distance change sound graphs for training {training_type} with config {config_file} and eating number {eating_number}")
+
+		def distance_average(distances: list[float]) -> float:
+			if len(distances) == 0: return 0.0
+			return sum([d/(d+1) for d in distances])/sum([1/(d+1) for d in distances])
+
+		training_replays = []
+		for path in Path(f"saved_data/{training_type}/{config_file}/{eating_number}").iterdir():
+			if path.is_file() and path.suffix == ".json":
+				with open(path, "r") as fp:
+					training_replay = load_training_replay_from_data(json.load(fp))
+					if "sound-perception-node" not in training_replay.perception_nodes:
+						continue
+					if training_replay.n_freq == None or training_replay.n_freq == 0:
+						continue
+					training_replays += [training_replay]
+			else: continue
+		if training_replays == []:
+			return
+		
+		training_replay = max(
+			training_replays, key=lambda tr: tr.average_performance
+		)
+
+		sound_distances : dict[tuple[int, ...], list[list[float]]] = {
+			key: [[] for _ in range(20)] for key in product([0, 1], repeat=training_replay.n_freq)
+			if not all(v == 0 for v in key)
+		}
+
+		brain = training_replay.brain
+		if brain == None:
+			raise Exception(f"{self.__class__.__name__}: generate_sound_graphs: Training has not been completed")
+		simulations : list[Simulation] = []
+		for _ in range(5):
+			sim = create_simulation(
+				training_replay.simulation_type, training_replay.generate_simulation_parameters(brain)
+			)
+			sim.start_loop()
+			simulations += [sim]
+		while not all([sim.finished for sim in simulations]):
+			pass
+
+		for sim in simulations:
+			for t, gen_sounds in enumerate(sim.sound_history):
+				for sound in gen_sounds:
+					for agent in sim.agents:
+						if agent.id == sound[0]:
+							continue
+						for tick in range(t, min(t+20, agent.last_time_step)):
+							try:
+								sound_distances[sound[2]][tick - t] += [sqrt(
+									(agent.get_from_state("x") - sound[1][0])**2 +
+									(agent.get_from_state("y") - sound[1][1])**2
+								)]
+							except: 
+								print(sound); input()
+		for sim in simulations: del sim
+
+		average_sound_distances : dict[tuple[int, ...], list[float]] = {
+			sound: [distance_average(dists) for dists in dist_lists]
+			for sound, dist_lists in sound_distances.items()
+		}
+		average_sound_distances : dict[tuple[int, ...], list[float]] = {
+			sound: [d/max(dists) for d in dists] if max(dists) > 0 else dists
+			for sound, dists in average_sound_distances.items()
+		}
+
+		colors = ['#D81B60','#1E88E5','#FFC107']
+		for i, (sound, dists) in enumerate(average_sound_distances.items()):
+			fig, ax = plt.subplots(layout="constrained")
+			ax.plot([i for i in range(len(dists))], dists, colors[i])
+			plt.xlabel("Time since sound (ticks)")
+			plt.ylabel("Average distance to sound origin")
+			plt.title(f"Sound {sound} average distance to sound origin over time")
+			path = f"saved_data/{training_type}/{config_file}/{eating_number}/sound_{sound}_distance_change.svg"
+			Path(path).unlink(missing_ok=True)
+			plt.savefig(path, format="svg")
+		plt.close('all')
 
 	def generate_graphs(self, starting_directory: str):
 		start_path = Path(f"saved_data/{starting_directory}")
@@ -223,7 +307,8 @@ class TerminalApplication(object):
 		print()
 		print(f"Training {training_type} average performance: {vals}")
 		fig, ax = plt.subplots(layout="constrained")
-		for i in agents:
+		colors = ['#D81B60','#1E88E5','#FFC107']
+		for j, i in enumerate(agents):
 			x_vals = list(vals.keys())
 			y_vals = [
 				sum(vals[key][i]["average-performance"])/len(vals[key][i]["average-performance"])
@@ -236,13 +321,13 @@ class TerminalApplication(object):
 				)
 				for j, key in enumerate(vals.keys())
 			]
-			ax.plot(x_vals, y_vals, label=f"{i}")
+			ax.plot(x_vals, y_vals, colors[j], label=f"{i}")
 			ax.fill_between(
 				x_vals, [val - std for val, std in zip(y_vals, stdev)],
-				[val + std for val, std in zip(y_vals, stdev)], color='b', alpha=.15
+				[val + std for val, std in zip(y_vals, stdev)], color=colors[j], alpha=.15
 			)
 		wrap_labels(ax, list(vals.keys()), 15)
-		ax.legend()
+		ax.legend(title="Eating Agents")
 		plt.xlabel("Configurations")
 		plt.ylabel("Average Duration (time steps)")
 		fig.suptitle("Average agent performance")
@@ -266,7 +351,7 @@ class TerminalApplication(object):
 	
 	def create_graph(self, data: GraphData, path: str) -> None:
 		_, ax = plt.subplots()
-		ax.plot([i for i in range(len(data["data"]))], data["data"])
+		ax.plot([i for i in range(len(data["data"]))], data["data"], '#D81B60')
 		plt.xlabel(data["x-label"])
 		plt.ylabel(data["y-label"])
 		plt.title(data["title"])

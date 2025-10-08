@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 	from src.food	import Food
 
 
-type Sound = tuple[tuple[int, int], tuple[int, ...]]
+type Sound = tuple[int, tuple[int, int], tuple[int, ...]]
 
 class EnvironmentData(TypedDict):
 	food_list	: NotRequired[list[Food]]

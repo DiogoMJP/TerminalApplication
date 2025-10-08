@@ -39,16 +39,16 @@ class Simulation(CreatableFromParameters):
 		self.eating_number					: int	= eating_number
 		self.max_time_steps					: int	= max_time_steps
 		
-		self.last_time_step		: int				= 0
-		self.finished			: bool				= False
-		self.time_step			: int				= 0
-		self.agents				: list[Agent]		= []
-		self.food				: list[Food]		= []
-		self.finished_food		: list[Food]		= []
+		self.last_time_step		: int							= 0
+		self.finished			: bool							= False
+		self.time_step			: int							= 0
+		self.agents				: list[Agent]					= []
+		self.food				: list[Food]					= []
+		self.finished_food		: list[Food]					= []
 		self.sounds				: list[Sound]		= []
 		self.prev_sounds		: list[Sound]		= []
 		self.sound_history		: list[list[Sound]]	= []
-		self.main_loop_thread	: Optional[Thread]	= None
+		self.main_loop_thread	: Optional[Thread]				= None
 
 	def get_n_alive_agents(self) -> int:
 		return len([1 for agent in self.agents if agent.alive])
@@ -61,8 +61,9 @@ class Simulation(CreatableFromParameters):
 		self.sound_history += [self.sounds]
 
 	def create_agents(self) -> None:
-		for _ in range(self.n_agents):
+		for i in range(self.n_agents):
 			params = self.generate_agent_parameters()
+			params["id"] = i
 			agent = create_agent(self.agent_type, params)
 			agent.set_in_state("x", int(random()*self.width))
 			agent.set_in_state("y", int(random()*self.height))

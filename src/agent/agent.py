@@ -12,10 +12,11 @@ if TYPE_CHECKING:
 
 class Agent(CreatableFromParameters):
 	def __init__(
-		self, brain: Brain, width: int, height: int, lifespan: int, lifespan_extension: int,
+		self, id: int, brain: Brain, width: int, height: int, lifespan: int, lifespan_extension: int,
 		perception_distance: int, poisonous_perception_distance: int,eating_distance: int,
 		state: dict[str, Any]
 	):
+		self.id								: int				= id
 		self.brain							: Brain				= brain
 		self.width							: int				= width
 		self.height							: int				= height
