@@ -30,15 +30,16 @@ class SoundPerceptionNode(PerceptionNode):
 		if len(sound_list) != 0:
 			sound_vec = [0.0, 0.0]
 			for _, sound_pos, sound_freq in sound_list:
-				dx = 0.04*(sound_pos[0] - x)
-				dy = 0.04*(sound_pos[1] - y)
-				dist_sq = dx*dx + dy*dy
-				if dist_sq > 0:
-					for freq, amplitude in enumerate(sound_freq):
-						ears_output[freq] += amplitude / dist_sq
-					if any(sound_freq) > 0:
-						sound_vec[0] += dx / dist_sq
-						sound_vec[1] += dy / dist_sq
+				if not all(s == 0 for s in sound_freq):
+					dx = 0.04*(sound_pos[0] - x)
+					dy = 0.04*(sound_pos[1] - y)
+					dist_sq = dx*dx + dy*dy
+					if dist_sq > 0:
+						for freq, amplitude in enumerate(sound_freq):
+							ears_output[freq] += amplitude / dist_sq
+						if any(sound_freq) > 0:
+							sound_vec[0] += dx / dist_sq
+							sound_vec[1] += dy / dist_sq
 			sound_angle = ((degrees(atan2(sound_vec[1], sound_vec[0])) - angle + 180) % 360 - 180) / 180
 		
 		return [tanh(val) for val in ears_output] + [sound_angle]
