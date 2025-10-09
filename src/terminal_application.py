@@ -58,12 +58,13 @@ class TerminalApplication(object):
 				if "n-repeats" not in self.params.keys():
 					raise Exception(f"{self.__class__.__name__}: Invalid parameter: n-repeats")
 				for eating_number in self.params["eating-numbers"]:
-					#for id in range(self.params["n-repeats"]):
-					#	self.train(training_type, config_name, eating_number, id)
-					#self.create_graphs_from_training_data(training_type, config_name, eating_number)
+					for id in range(self.params["n-repeats"]):
+						self.train(training_type, config_name, eating_number, id)
+					self.create_graphs_from_training_data(training_type, config_name, eating_number)
 					self.generate_distance_sound_graphs(training_type, config_name, eating_number)
-					#self.generate_distance_change_sound_graphs(training_type, config_name, eating_number)
-			#self.generate_average_performance_graph(training_type)
+					self.generate_distance_change_sound_graphs(training_type, config_name, eating_number)
+					self.get_number_of_nodes(training_type, config_name, eating_number)
+			self.generate_average_performance_graph(training_type)
 
 		print()
 		print("Training completed.")
@@ -289,7 +290,6 @@ class TerminalApplication(object):
 
 		sound_distances : dict[tuple[int, ...], list[list[float]]] = {
 			key: [[] for _ in range(20)] for key in product([0, 1], repeat=training_replay.n_freq)
-			if not all(v == 0 for v in key)
 		}
 
 		brain = training_replay.brain
@@ -312,13 +312,10 @@ class TerminalApplication(object):
 						if agent.id == sound[0]:
 							continue
 						for tick in range(t, min(t+20, agent.last_time_step)):
-							try:
-								sound_distances[sound[2]][tick - t] += [sqrt(
-									(agent.get_from_state("x") - sound[1][0])**2 +
-									(agent.get_from_state("y") - sound[1][1])**2
-								)]
-							except: 
-								print(sound); input()
+							sound_distances[sound[2]][tick - t] += [sqrt(
+								(agent.get_from_state("x") - sound[1][0])**2 +
+								(agent.get_from_state("y") - sound[1][1])**2
+							)]
 		for sim in simulations: del sim
 
 		average_sound_distances : dict[tuple[int, ...], list[float]] = {
@@ -326,16 +323,18 @@ class TerminalApplication(object):
 			for sound, dist_lists in sound_distances.items()
 		}
 		average_sound_distances : dict[tuple[int, ...], list[float]] = {
-			sound: [d/max(dists) for d in dists] if max(dists) > 0 else dists
+			sound: [d/dists[0] * 100 for d in dists]
+			if dists[0] != 0.0 else [100.0 for _ in dists]
 			for sound, dists in average_sound_distances.items()
 		}
 
 		colors = ['#D81B60','#1E88E5','#FFC107']
+		average_sound_distances.pop((0,) * training_replay.n_freq)
 		for i, (sound, dists) in enumerate(average_sound_distances.items()):
 			fig, ax = plt.subplots(layout="constrained")
 			ax.plot([i for i in range(len(dists))], dists, colors[i])
 			plt.xlabel("Time since sound (ticks)")
-			plt.ylabel("Average distance to sound origin")
+			plt.ylabel("Average distance to sound origin (% of initial distance)")
 			plt.title(f"Sound {sound} average distance to sound origin over time")
 			path = f"saved_data/{training_type}/{config_file}/{eating_number}/sound_{sound}_distance_change.pdf"
 			Path(path).unlink(missing_ok=True)
@@ -388,6 +387,19 @@ class TerminalApplication(object):
 		Path(f"saved_data/{training_type}/average_performance.svg").unlink(missing_ok=True)
 		fig.savefig(f"saved_data/{training_type}/average_performance.pdf", format="pdf")
 		plt.close('all')
+	
+	def get_number_of_nodes(self, training_type: str, config_name: str, eating_number: int) -> None:
+		start_path = Path(f"saved_data/{training_type}/{config_name}/{eating_number}")
+		nodes = []
+		for config in start_path.iterdir():
+			if config.suffix == ".json":
+				with open(config, "r") as fp:
+					training_replay = load_training_replay_from_data(json.load(fp))
+					if training_replay.brain != None:
+						nodes += [training_replay.brain.get_n_nodes()]
+		with open(start_path.joinpath("nodes.txt"), "w+") as fp:
+			for n in nodes:
+				fp.write(f"{n}\n")
 
 	def join_graph_data(self, data_list: list[GraphData]) -> GraphData:
 		data = [
