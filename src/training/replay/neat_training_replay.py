@@ -36,13 +36,15 @@ class NeatTrainingReplay(TrainingReplay):
 	
 	def get_fitness_graph_data(self) -> GraphData:
 		return {
-			"title": "Average Fitness Over Generations",
+			"title": "",
 			"filename": "fitness",
-			"x-label": "Generation",
-			"y-label": "Average Fitness",
+			"x-label": "",
+			"y-label": "",
+			"width": 0.23,
+			"colour": '#D81B60',
 			"data": [
 				sum([
-					sum([1 for food in sim.food if food["eaten"]])
+					sum([1 for food in sim.food if food["eaten"] and food["poisonous"] == False])
 					for sim in gen.values()
 				]) / len(gen.values())
 				for _, gen in self.simulations.items()
@@ -51,10 +53,12 @@ class NeatTrainingReplay(TrainingReplay):
 
 	def get_node_graph_data(self) -> GraphData:
 		return {
-			"title": "Average Number of Nodes Over Generations",
+			"title": "",
 			"filename": "nodes",
-			"x-label": "Generation",
-			"y-label": "Average Number of Nodes",
+			"x-label": "",
+			"y-label": "",
+			"width": 0.23,
+			"colour": '#1E88E5',
 			"data": [
 				sum([sim.brain.get_n_nodes() for sim in gen.values()]) / len(gen.values())
 				for _, gen in self.simulations.items()
@@ -63,10 +67,12 @@ class NeatTrainingReplay(TrainingReplay):
 	
 	def get_duration_graph_data(self) -> GraphData:
 		return {
-			"title": "Average Duration of Simulations Over Generations",
+			"title": "",
 			"filename": "duration",
-			"x-label": "Generation",
-			"y-label": "Average Duration (time steps)",
+			"x-label": "",
+			"y-label": "",
+			"width": 0.23,
+			"colour": '#D81B60',
 			"data": [
 				sum([
 					sim.duration for sim in gen.values()
@@ -77,10 +83,12 @@ class NeatTrainingReplay(TrainingReplay):
 
 	def get_food_graph_data(self) -> GraphData:
 		return {
-			"title": "Average Amount of Food Over Each Time Step",
+			"title": "",
 			"filename": "food",
-			"x-label": "Time Step",
-			"y-label": "Average Amount of Food",
+			"x-label": "",
+			"y-label": "",
+			"width": 0.23,
+			"colour": '#FFC107',
 			"data": [sum([
 				sum([
 					len([

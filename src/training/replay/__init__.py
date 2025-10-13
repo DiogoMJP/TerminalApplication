@@ -1,7 +1,7 @@
 from src.training.replay.training_replay		import TrainingReplay
 from src.training.replay.neat_training_replay	import NeatTrainingReplay
 
-from typing				import Any, TypedDict
+from typing	import Any, TypedDict
 
 
 GraphData = TypedDict("GraphData", {
@@ -9,6 +9,8 @@ GraphData = TypedDict("GraphData", {
 	"filename": str,
 	"x-label": str,
 	"y-label": str,
+	"width": float,
+	"colour": str,
 	"data": list[float]
 })
 

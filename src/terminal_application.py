@@ -8,10 +8,23 @@ import matplotlib
 matplotlib.use('Agg')
 import json
 import matplotlib.pyplot as plt
+plt.rcParams.update({
+    "font.family": "sans-serif",     # Helvetica is a sans-serif font
+    "font.sans-serif": "Arial",
+    "font.size": 5,                 # Match your document 10pt
+    "axes.labelsize": 6,
+    "axes.titlesize": 6,
+    "xtick.labelsize": 6,
+    "ytick.labelsize": 6,
+    "legend.fontsize": 6,
+    "figure.titlesize": 6,
+	"lines.linewidth": 0.25
+})
 import textwrap
 from itertools	import product
 from math		import sqrt
 from pathlib	import Path
+from textwrap	import wrap
 from time		import time
 from typing		import Any, TYPE_CHECKING
 
@@ -34,6 +47,7 @@ def wrap_labels(ax, labels, width, break_long_words=False):
 		labels[i] = textwrap.fill(label, width=width, break_long_words=break_long_words)
 	ax.set_xticklabels(labels, rotation=0)
 
+textwidth_pt = 455.244
 
 class TerminalApplication(object):
 	def __init__(self):
@@ -179,9 +193,13 @@ class TerminalApplication(object):
 					if poi_dist != float('inf'):
 						poisonous_sounds[sound[2]] += [poi_dist]
 		for sim in simulations: del sim
+
+		textwidth_pt = 455.244
+		fig_width = 0.45 * (textwidth_pt / 72.27) 
+		fig_height = fig_width * 8/10
 	
 		labels = [str(key) for key in regular_sounds.keys()]
-		fig, ax = plt.subplots(layout="constrained")
+		fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 		dists = [dists for dists in regular_sounds.values()]
 		stacked_bars = [
 			[
@@ -218,9 +236,9 @@ class TerminalApplication(object):
 		plt.legend(title="Sound Channels")
 		path = f"saved_data/{training_type}/{config_file}/{eating_number}/regular_sound_.pdf"
 		Path(path).unlink(missing_ok=True)
-		plt.savefig(path, format="pdf")
+		plt.savefig(path, format="pdf", dpi=1000, bbox_inches="tight", pad_inches=0.08)
 		if training_replay.poisonous_food_rate != None and training_replay.poisonous_food_rate > 0:
-			fig, ax = plt.subplots(layout="constrained")
+			fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 			dists = [dists for dists in poisonous_sounds.values()]
 			stacked_bars = [
 				[
@@ -257,7 +275,7 @@ class TerminalApplication(object):
 			plt.legend(title="Sound Channels")
 			path = f"saved_data/{training_type}/{config_file}/{eating_number}/poisonous_sound_.pdf"
 			Path(path).unlink(missing_ok=True)
-			plt.savefig(path, format="pdf")
+			plt.savefig(path, format="pdf", dpi=1000, bbox_inches="tight", pad_inches=0.08)
 		plt.close('all')
 	
 	def generate_distance_change_sound_graphs(
@@ -328,17 +346,20 @@ class TerminalApplication(object):
 			for sound, dists in average_sound_distances.items()
 		}
 
+		textwidth_pt = 455.244
+		fig_width = 0.3 * (textwidth_pt / 72.27) 
+		fig_height = fig_width * 8/10
 		colors = ['#D81B60','#1E88E5','#FFC107']
 		average_sound_distances.pop((0,) * training_replay.n_freq)
 		for i, (sound, dists) in enumerate(average_sound_distances.items()):
-			fig, ax = plt.subplots(layout="constrained")
+			fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 			ax.plot([i for i in range(len(dists))], dists, colors[i])
-			plt.xlabel("Time since sound (ticks)")
-			plt.ylabel("Average distance to sound origin (% of initial distance)")
-			plt.title(f"Sound {sound} average distance to sound origin over time")
+			plt.xlabel("Time since sound (time steps)")
+			plt.ylabel("Distance to sound origin\n(% of initial distance)")
+			plt.title(f"Sound {sound} average distance\nto sound origin over time")
 			path = f"saved_data/{training_type}/{config_file}/{eating_number}/sound_{sound}_distance_change.pdf"
 			Path(path).unlink(missing_ok=True)
-			plt.savefig(path, format="pdf")
+			plt.savefig(path, format="pdf", dpi=1000, bbox_inches="tight", pad_inches=0.08)
 		plt.close('all')
 
 	def generate_graphs(self, starting_directory: str):
@@ -359,7 +380,12 @@ class TerminalApplication(object):
 		agents = tuple(vals[list(vals.keys())[0]].keys())
 		print()
 		print(f"Training {training_type} average performance: {vals}")
-		fig, ax = plt.subplots(layout="constrained")
+
+		textwidth_pt = 455.244
+		fig_width = 0.45 * (textwidth_pt / 72.27) 
+		fig_height = fig_width * 8/10
+
+		fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 		colors = ['#D81B60','#1E88E5','#FFC107']
 		for j, i in enumerate(agents):
 			x_vals = list(vals.keys())
@@ -384,8 +410,11 @@ class TerminalApplication(object):
 		plt.xlabel("Configurations")
 		plt.ylabel("Average Duration (time steps)")
 		fig.suptitle("Average agent performance")
-		Path(f"saved_data/{training_type}/average_performance.svg").unlink(missing_ok=True)
-		fig.savefig(f"saved_data/{training_type}/average_performance.pdf", format="pdf")
+		Path(f"saved_data/{training_type}/average_performance.pdf").unlink(missing_ok=True)
+		fig.savefig(
+			f"saved_data/{training_type}/average_performance.pdf", format="pdf",
+			dpi=1000, bbox_inches="tight", pad_inches=0.08
+		)
 		plt.close('all')
 	
 	def get_number_of_nodes(self, training_type: str, config_name: str, eating_number: int) -> None:
@@ -397,6 +426,7 @@ class TerminalApplication(object):
 					training_replay = load_training_replay_from_data(json.load(fp))
 					if training_replay.brain != None:
 						nodes += [training_replay.brain.get_n_nodes()]
+		print(f"Number of nodes for training {training_type} with config {config_name} and eating number {eating_number}: {sum(nodes)/len(nodes)}")
 		with open(start_path.joinpath("nodes.txt"), "w+") as fp:
 			for n in nodes:
 				fp.write(f"{n}\n")
@@ -412,17 +442,25 @@ class TerminalApplication(object):
 			"filename": data_list[0]["filename"],
 			"x-label": data_list[0]["x-label"],
 			"y-label": data_list[0]["y-label"],
+			"width": data_list[0]["width"],
+			"colour": data_list[0]["colour"],
 			"data": data
 		}
 	
 	def create_graph(self, data: GraphData, path: str) -> None:
-		_, ax = plt.subplots()
-		ax.plot([i for i in range(len(data["data"]))], data["data"], '#D81B60')
-		plt.xlabel(data["x-label"])
-		plt.ylabel(data["y-label"])
+		textwidth_pt = 455.244
+		fig_width = data["width"] * (textwidth_pt / 72.27) 
+		fig_height = fig_width * 8/10
+		_, ax = plt.subplots(figsize=(fig_width, fig_height))
+		ax.plot([i for i in range(len(data["data"]))], data["data"], data["colour"] if "colour" in data else 'b')
+		plt.xlabel("\n".join(wrap(data["x-label"], 16)))
+		plt.ylabel("\n".join(wrap(data["y-label"], 16)))
 		plt.title(data["title"])
-		Path(path + f"/{data['filename']}.svg").unlink(missing_ok=True)
-		plt.savefig(path + f"/{data['filename']}.pdf", format="pdf")
+		Path(path + f"/{data['filename']}.pdf").unlink(missing_ok=True)
+		plt.savefig(
+			path + f"/{data['filename']}.pdf", format="pdf",
+			dpi=1000, bbox_inches="tight", pad_inches=0.08
+		)
 		plt.close('all')
 
 	def create_graphs_from_training_data(self, training_type: str, config_file: str, eating_number: int) -> None:
